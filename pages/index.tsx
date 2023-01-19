@@ -5,7 +5,7 @@ import demoFromHTML from './export';
 import axios from 'axios';
 
 async function sendEmail() {
-  await axios.post("/api/subscribe", {email:"dafelcardozo@gmail.com", text:"Hola Felipe desde local"});
+  await axios.post("/api/subscribe", {email:"dafelcardozo@hotmail.com", text:"Hola Felipe desde local"});
   //console.log(resp);
 }
 
