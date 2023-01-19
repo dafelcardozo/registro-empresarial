@@ -1,3 +1,4 @@
+import React, { FC } from 'react';
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
@@ -10,7 +11,17 @@ import { useState } from 'react';
 async function sendEmail() {
   await axios.post("/api/subscribe", { email: "dafelcardozo@hotmail.com", text: "Hola Felipe desde local" });
 }
-function LoginForm({onFormSubmit}) {
+type LoginProps = {
+  email: string,
+  password: string
+};
+
+type formProps = {
+  onFormSubmit: FC<LoginProps>,
+}
+
+const LoginForm = (props:formProps) => {
+  const {onFormSubmit} = props;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('')
   return <form onSubmit={(event) => {event.preventDefault();
