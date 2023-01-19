@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "jspdf": "^2.5.1",
     "mongodb": "^4.8.1",
     "next": "latest",
     "react": "^18.2.0",

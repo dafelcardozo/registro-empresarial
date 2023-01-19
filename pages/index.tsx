@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
+import demoFromHTML from './export';
 
 export async function getServerSideProps(context:any) {
   try {
@@ -39,6 +40,9 @@ export default function Home({
         <h1 className="title">
           Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
         </h1>
+        <div>Export PDF button: 
+          <button onClick={demoFromHTML}>Export PDF button</button>
+        </div>
 
         {isConnected ? (
           <h2 className="subtitle">You are connected to MongoDB</h2>
