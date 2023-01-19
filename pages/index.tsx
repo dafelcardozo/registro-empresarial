@@ -18,10 +18,10 @@ function RegistroEmpresarial() {
       <label htmlFor='empresa'>¿Cómo se llama tu empresa?</label>
       <input type='text' name='empresa' placeholder='Mi empresa'></input>
       <label htmlFor='nit'>NIT</label>
-      <input type='text' name='nit' placeholder='12345'></input>
-      <label htmlFor='direccion'></label>
+      <input type='text' name='nit' placeholder='12345'>NIT o Número de Identificación Tributaria</input>
+      <label htmlFor='direccion'>Dirección</label>
       <input type='text' name="direccion" placeholder='Calle 123, Bogota'></input>
-      <label htmlFor='telefono' ></label>
+      <label htmlFor='telefono' >Teléfono</label>
       <input type='text' name='telefono' placeholder='+57 313 413 6320'></input>
     </form>
   </div>
