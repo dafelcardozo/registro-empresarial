@@ -8,8 +8,8 @@ import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState } from 'react';
 
-async function sendEmail() {
-  await axios.post("/api/subscribe", { email: "dafelcardozo@hotmail.com", text: "Hola Felipe desde local" });
+async function subscribe(email:string) {
+  await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
 }
 type LoginProps = {
   email: string,
@@ -17,7 +17,33 @@ type LoginProps = {
 };
 
 type formProps = {
-  onFormSubmit: Function,
+  onFormSubmit: (email:string, password:string) => void,
+}
+
+
+async function verifyLogin(props:LoginProps) {
+  const {email, password} = props;
+  const resp = await axios.post("api/verify", {email, password});
+  if (resp.status == 200) {
+    console.info('Accepted');
+  } else {
+    console.info('Rejected');
+  }
+
+}
+
+type Company {
+  email: string,
+  password: string,
+  nombre: string, 
+  nit: number,
+  direccion: string,
+  telefono: string
+}
+
+async function postCompany(company:Company) {
+  const resp = await axios.post('api/company', company);
+  console.info('Okay!')
 }
 
 const LoginForm = (props:formProps) => {
@@ -25,7 +51,7 @@ const LoginForm = (props:formProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('')
   return <form onSubmit={(event) => {event.preventDefault();
-                                onFormSubmit({email, password});}}>
+                                onFormSubmit(email, password);}}>
     <div className="form-outline mb-4">
       <input type="email" id="form1Example1" className="form-control" value={email} onChange={(event) => setEmail(event.target.value)}/>
       <label className="form-label" htmlFor="form1Example1">Email address</label>
@@ -34,48 +60,55 @@ const LoginForm = (props:formProps) => {
       <input type="password" id="form1Example2" className="form-control" onChange={(event) => setPassword(event.target.value)} />
       <label className="form-label" htmlFor="form1Example2">Password</label>
     </div>
-    <div className="row mb-4">
-      <div className="col d-flex justify-content-center">
-        <div className="form-check">
-          <input className="form-check-input" type="checkbox"  id="form1Example3" />
-          <label className="form-check-label" htmlFor="form1Example3"> Remember me </label>
-        </div>
-      </div>
-      <div className="col">
-        <a href="#!">Forgot password?</a>
-      </div>
-    </div>
-    <button type="submit" className="btn btn-primary btn-block" >Sign in</button>
+    <button type="submit" className="btn btn-primary btn-block" >Ingresar</button>
+    <button type="submit" className='btn btn-secondary btn-block'>Registrarme</button>
   </form>
 }
 
-function RegistroEmpresarial() {
-  return <form >
-                  <h1 className="title">
-                Regístrese para que le enviemos un montón de correo!
-              </h1>
-    <h2>Formulario de registro</h2>
+
+function RegistroEmpresarial(props:LoginProps) {
+  const {email, password} = props;
+  const [nombre, setNombre] = useState('');
+  const [nit, setNit] = useState('');
+  const [direccion, setDireccion] = useState('');
+  const [telefono, setTelefono] = useState('');
+  return <form onSubmit={async (e) =>  {
+    e.preventDefault();
+    await postCompany({email, password, nombre, nit:parseInt(nit), direccion, telefono});
+    
+  }
+
+  }>
+        <h1 className="title">
+      Subscríbete a mi newsletter
+    </h1>   
+    <div className="form-outline mb-4">
+      <div >Correo electrónico: </div>
+      <div>{email}</div>
+      <div>Password: {password}</div>
+    
+    </div>
+ 
     <div className="form-outline mb-4">
       <label htmlFor='empresa' className="form-label" >¿Cómo se llama tu empresa?</label>
-      <input type='text' name='empresa' placeholder='Mi empresa' className="form-control"></input>
+      <input type='text' name='nombre' placeholder='Mi empresa' className="form-control" value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
 
     </div>
     <div className="form-outline mb-4">
       <label htmlFor='nit' className="form-label" >NIT o Número de Identificación Tributaria</label>
-      <input type='text' name='nit' placeholder='12345' className="form-control"></input>
+      <input type='text' name='nit' placeholder='12345' className="form-control" value={nit} onChange={(e) => setNit(e.target.value)}></input>
 
     </div>
     <div className="form-outline mb-4">
       <label htmlFor='direccion' className="form-label">Dirección</label>
-      <input type='text' name="direccion" placeholder='Calle 123, Bogota' className="form-control"></input>
-
+      <input type='text' name="direccion" placeholder='Calle 123, Bogota' className="form-control" value={direccion} onChange={(e) => setDireccion(e.target.value)}></input>
     </div>
     <div className="form-outline mb-4">
       <label htmlFor='telefono' className="form-label" >Teléfono</label>
-      <input type='text' name='telefono' placeholder='+57 313 413 6320' className="form-control"></input>
-
+      <input type='text' name='telefono' placeholder='+57 313 413 6320' className="form-control" value={telefono} onChange={(e) => setTelefono(e.target.value)}></input>
     </div>
     <button type="submit" className="btn btn-primary btn-block">Terminar registro</button>
+    <button className="btn btn-secondary btn-block">Cancelar</button>
   </form>
 }
 
@@ -108,7 +141,7 @@ function ActionButtons() {
     <button onClick={demoFromHTML}>Export PDF button</button>
   </div>
   <div>Send an email:
-    <button onClick={sendEmail}>Send email button</button>
+    <button onClick={() => subscribe('')}>Send email button</button>
   </div>
   </>;
 }
@@ -192,7 +225,8 @@ export default function Home({
   isConnected,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [formVisible, setFormVisible] = useState(false);
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <div>
@@ -206,15 +240,20 @@ export default function Home({
         <div className="container-fluid">
           <div className="row">
             <div className="col-lg-6 vh-100">
-              <LoginForm onFormSubmit={() => setFormVisible(true)} ></LoginForm>
+              <LoginForm onFormSubmit={(email, password) => { 
+                setFormVisible(true);
+                setEmail(email);
+                setPassword(password);
+                }} ></LoginForm>
             </div>
             {!formVisible &&
-            <div className="col-lg-6 vh-100 bg-primary">
+            <div className="col-lg-6 vh-100">
+              <img src='esplanade-louvre.webp' style={{width:"100%"}}></img>
             </div>
             }
             {formVisible &&
             <div className="col-lg-6 vh-100">
-                <RegistroEmpresarial></RegistroEmpresarial>
+                <RegistroEmpresarial email={email} password={password}></RegistroEmpresarial>
             </div>}
             <main>              
               {false && <ActionButtons></ActionButtons>}
