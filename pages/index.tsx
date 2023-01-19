@@ -17,7 +17,7 @@ type LoginProps = {
 };
 
 type formProps = {
-  onFormSubmit: FC<LoginProps>,
+  onFormSubmit: Function,
 }
 
 const LoginForm = (props:formProps) => {
