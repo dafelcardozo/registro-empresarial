@@ -3,10 +3,20 @@ import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
 import demoFromHTML from './export';
 import axios from 'axios';
+import 'mdb-ui-kit/css/mdb.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 async function sendEmail() {
   await axios.post("/api/subscribe", {email:"dafelcardozo@hotmail.com", text:"Hola Felipe desde local"});
   //console.log(resp);
+}
+
+function RegistroEmpresarial() {
+  return <div>
+    <form>
+      <h2>Formulario de registro</h2>
+    </form>
+  </div>
 }
 
 export async function getServerSideProps(context:any) {
@@ -38,13 +48,13 @@ export default function Home({
   return (
     <div className="container">
       <Head>
-        <title>Create Next App</title>
+        <title>Registro empresarial</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
         <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
+          Regístrese para que le enviemos un montón de correo!
         </h1>
         <div>Export PDF button: 
           <button onClick={demoFromHTML}>Export PDF button</button>
@@ -52,6 +62,7 @@ export default function Home({
         <div>Send an email: 
           <button onClick={sendEmail}>Send email button</button>
         </div>
+        <RegistroEmpresarial></RegistroEmpresarial>
 
         {isConnected ? (
           <h2 className="subtitle">You are connected to MongoDB</h2>
@@ -62,40 +73,12 @@ export default function Home({
           </h2>
         )}
 
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
         <div className="grid">
           <a href="https://nextjs.org/docs" className="card">
             <h3>Documentation &rarr;</h3>
             <p>Find in-depth information about Next.js features and API.</p>
           </a>
 
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="card"
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
         </div>
       </main>
 

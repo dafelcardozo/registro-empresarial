@@ -27,7 +27,6 @@ export default async (req, res) => {
 
   try {
     console.info("Sending email");
-    console.info({url, data, options})
     const response = await axios.post(url, data, options);
     if (response.status >= 400) {
       return res.status(400).json({
