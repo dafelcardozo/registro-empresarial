@@ -7,27 +7,62 @@ import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 async function sendEmail() {
-  await axios.post("/api/subscribe", {email:"dafelcardozo@hotmail.com", text:"Hola Felipe desde local"});
-  //console.log(resp);
+  await axios.post("/api/subscribe", { email: "dafelcardozo@hotmail.com", text: "Hola Felipe desde local" });
+}
+function LoginForm() {
+  return <form>
+    <div className="form-outline mb-4">
+      <input type="email" id="form1Example1" />
+      <label className="form-label" htmlFor="form1Example1">Email address</label>
+    </div>
+    <div className="form-outline mb-4">
+      <input type="password" id="form1Example2" className="form-control" />
+      <label className="form-label" htmlFor="form1Example2">Password</label>
+    </div>
+    <div className="row mb-4">
+      <div className="col d-flex justify-content-center">
+        <div className="form-check">
+          <input className="form-check-input" type="checkbox" value="" id="form1Example3" checked />
+          <label className="form-check-label" htmlFor="form1Example3"> Remember me </label>
+        </div>
+      </div>
+
+      <div className="col">
+        <a href="#!">Forgot password?</a>
+      </div>
+    </div>
+    <button type="submit" className="btn btn-primary btn-block">Sign in</button>
+  </form>
 }
 
 function RegistroEmpresarial() {
-  return <div>
-    <form>
-      <h2>Formulario de registro</h2>
-      <label htmlFor='empresa'>¿Cómo se llama tu empresa?</label>
-      <input type='text' name='empresa' placeholder='Mi empresa'></input>
-      <label htmlFor='nit'>NIT</label>
-      <input type='text' name='nit' placeholder='12345'>NIT o Número de Identificación Tributaria</input>
-      <label htmlFor='direccion'>Dirección</label>
-      <input type='text' name="direccion" placeholder='Calle 123, Bogota'></input>
-      <label htmlFor='telefono' >Teléfono</label>
-      <input type='text' name='telefono' placeholder='+57 313 413 6320'></input>
-    </form>
-  </div>
+  return <form >
+    <h2>Formulario de registro</h2>
+    <div className="form-outline mb-4">
+      <label htmlFor='empresa' className="form-label" >¿Cómo se llama tu empresa?</label>
+      <input type='text' name='empresa' placeholder='Mi empresa' className="form-control"></input>
+
+    </div>
+    <div className="form-outline mb-4">
+      <label htmlFor='nit' className="form-label" >NIT o Número de Identificación Tributaria</label>
+      <input type='text' name='nit' placeholder='12345' className="form-control"></input>
+
+    </div>
+    <div className="form-outline mb-4">
+      <label htmlFor='direccion' className="form-label">Dirección</label>
+      <input type='text' name="direccion" placeholder='Calle 123, Bogota' className="form-control"></input>
+
+    </div>
+    <div className="form-outline mb-4">
+      <label htmlFor='telefono' className="form-label" >Teléfono</label>
+      <input type='text' name='telefono' placeholder='+57 313 413 6320' className="form-control"></input>
+
+    </div>
+    <button type="submit" className="btn btn-primary btn-block">Terminar registro</button>
+  </form>
 }
 
-export async function getServerSideProps(context:any) {
+export async function getServerSideProps(context: any) {
   try {
     await clientPromise
     // `await clientPromise` will use the default database passed in the MONGODB_URI
@@ -50,206 +85,135 @@ export async function getServerSideProps(context:any) {
   }
 }
 
+function ActionButtons() {
+  return <>
+  <div >Export PDF button:
+                <button onClick={demoFromHTML}>Export PDF button</button>
+              </div>
+              <div>Send an email:
+                <button onClick={sendEmail}>Send email button</button>
+              </div>
+  </>;
+}
+
+function Navbar() {
+  return <>
+  <header className="mb-10">
+  
+    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <div className="container-fluid">
+        <button className="navbar-toggler" type="button" data-mdb-toggle="collapse"
+          data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <i className="fas fa-bars"></i>
+        </button>
+  
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <a className="navbar-brand mt-2 mt-lg-0" href="#">
+            <img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="15" alt="MDB Logo"
+         />
+          </a>
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <a className="nav-link" href="#">Dashboard</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#">Team</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#">Projects</a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="d-flex align-items-center">
+          <a className="text-reset me-3" href="#">
+            <i className="fas fa-shopping-cart"></i>
+          </a>
+
+          <div className="dropdown">
+            <a className="text-reset me-3 dropdown-toggle hidden-arrow" href="#" id="navbarDropdownMenuLink" role="button"
+              data-mdb-toggle="dropdown" aria-expanded="false">
+              <i className="fas fa-bell"></i>
+              <span className="badge rounded-pill badge-notification bg-danger">1</span>
+            </a>
+            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+              <li>
+                <a className="dropdown-item" href="#">Some news</a>
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">Another news</a>
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">Something else here</a>
+              </li>
+            </ul>
+          </div>
+          <div className="dropdown">
+            <a className="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar"
+              role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+              <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" className="rounded-circle" height="25"
+                alt="Black and White Portrait of a Man"  />
+            </a>
+            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+              <li>
+                <a className="dropdown-item" href="#">My profile</a>
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">Settings</a>
+              </li>
+              <li>
+                <a className="dropdown-item" href="#">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+    </header>
+    </>
+}
+
 export default function Home({
   isConnected,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <div className="container">
+    <div>
       <Head>
         <title>Registro empresarial</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Navbar></Navbar>
+      
+      <section>
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-lg-6 vh-100">
+              <LoginForm></LoginForm>
+            </div>
+            <div className="col-lg-6 vh-100 bg-primary">
+            </div>
+            <main>
+              <h1 className="title">
+                Regístrese para que le enviemos un montón de correo!
+              </h1>
+              
 
-      <main>
-        <h1 className="title">
-          Regístrese para que le enviemos un montón de correo!
-        </h1>
-        <div>Export PDF button: 
-          <button onClick={demoFromHTML}>Export PDF button</button>
+              <RegistroEmpresarial></RegistroEmpresarial>
+              {false && <ActionButtons></ActionButtons>}
+              {isConnected ? (
+                <div className="subtitle">You are connected to MongoDB</div>
+              ) : (
+                <div className="subtitle">
+                  You are NOT connected to MongoDB. Check the <code>README.md</code>{' '}
+                  for instructions.
+                </div>
+              )}
+
+            </main>
+          </div>
         </div>
-        <div>Send an email: 
-          <button onClick={sendEmail}>Send email button</button>
-        </div>
-        <RegistroEmpresarial></RegistroEmpresarial>
-
-        {isConnected ? (
-          <h2 className="subtitle">You are connected to MongoDB</h2>
-        ) : (
-          <h2 className="subtitle">
-            You are NOT connected to MongoDB. Check the <code>README.md</code>{' '}
-            for instructions.
-          </h2>
-        )}
-
-        <div className="grid">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        .container {
-          min-height: 100vh;
-          padding: 0 0.5rem;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .title a {
-          color: #0070f3;
-          text-decoration: none;
-        }
-
-        .title a:hover,
-        .title a:focus,
-        .title a:active {
-          text-decoration: underline;
-        }
-
-        .title {
-          margin: 0;
-          line-height: 1.15;
-          font-size: 4rem;
-        }
-
-        .title,
-        .description {
-          text-align: center;
-        }
-
-        .subtitle {
-          font-size: 2rem;
-        }
-
-        .description {
-          line-height: 1.5;
-          font-size: 1.5rem;
-        }
-
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-
-        .grid {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          max-width: 800px;
-          margin-top: 3rem;
-        }
-
-        .card {
-          margin: 1rem;
-          flex-basis: 45%;
-          padding: 1.5rem;
-          text-align: left;
-          color: inherit;
-          text-decoration: none;
-          border: 1px solid #eaeaea;
-          border-radius: 10px;
-          transition: color 0.15s ease, border-color 0.15s ease;
-        }
-
-        .card:hover,
-        .card:focus,
-        .card:active {
-          color: #0070f3;
-          border-color: #0070f3;
-        }
-
-        .card h3 {
-          margin: 0 0 1rem 0;
-          font-size: 1.5rem;
-        }
-
-        .card p {
-          margin: 0;
-          font-size: 1.25rem;
-          line-height: 1.5;
-        }
-
-        .logo {
-          height: 1em;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            width: 100%;
-            flex-direction: column;
-          }
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
+      </section>
     </div>
   )
 }
