@@ -3,6 +3,7 @@ import { jsPDF } from "jspdf";
 
 
 export default function demoFromHTML() {
+    // Weird.
     const pdf = new jsPDF('p', 'pt', 'letter');
     // source can be HTML-formatted string, or a reference
     // to an actual DOM element from which the text will be scraped.
