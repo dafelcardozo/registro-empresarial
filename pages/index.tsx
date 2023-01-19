@@ -2,6 +2,12 @@ import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
 import demoFromHTML from './export';
+import axios from 'axios';
+
+async function sendEmail() {
+  await axios.post("/api/subscribe", {email:"dafelcardozo@gmail.com", text:"Hola Felipe desde local"});
+  //console.log(resp);
+}
 
 export async function getServerSideProps(context:any) {
   try {
@@ -42,6 +48,9 @@ export default function Home({
         </h1>
         <div>Export PDF button: 
           <button onClick={demoFromHTML}>Export PDF button</button>
+        </div>
+        <div>Send an email: 
+          <button onClick={sendEmail}>Send email button</button>
         </div>
 
         {isConnected ? (
