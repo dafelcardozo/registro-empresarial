@@ -5,38 +5,44 @@ import demoFromHTML from './export';
 import axios from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { useState } from 'react';
 
 async function sendEmail() {
   await axios.post("/api/subscribe", { email: "dafelcardozo@hotmail.com", text: "Hola Felipe desde local" });
 }
-function LoginForm() {
-  return <form>
+function LoginForm({onFormSubmit}) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('')
+  return <form onSubmit={(event) => {event.preventDefault();
+                                onFormSubmit({email, password});}}>
     <div className="form-outline mb-4">
-      <input type="email" id="form1Example1" />
+      <input type="email" id="form1Example1" className="form-control" value={email} onChange={(event) => setEmail(event.target.value)}/>
       <label className="form-label" htmlFor="form1Example1">Email address</label>
     </div>
     <div className="form-outline mb-4">
-      <input type="password" id="form1Example2" className="form-control" />
+      <input type="password" id="form1Example2" className="form-control" onChange={(event) => setPassword(event.target.value)} />
       <label className="form-label" htmlFor="form1Example2">Password</label>
     </div>
     <div className="row mb-4">
       <div className="col d-flex justify-content-center">
         <div className="form-check">
-          <input className="form-check-input" type="checkbox" value="" id="form1Example3" checked />
+          <input className="form-check-input" type="checkbox"  id="form1Example3" />
           <label className="form-check-label" htmlFor="form1Example3"> Remember me </label>
         </div>
       </div>
-
       <div className="col">
         <a href="#!">Forgot password?</a>
       </div>
     </div>
-    <button type="submit" className="btn btn-primary btn-block">Sign in</button>
+    <button type="submit" className="btn btn-primary btn-block" >Sign in</button>
   </form>
 }
 
 function RegistroEmpresarial() {
   return <form >
+                  <h1 className="title">
+                Regístrese para que le enviemos un montón de correo!
+              </h1>
     <h2>Formulario de registro</h2>
     <div className="form-outline mb-4">
       <label htmlFor='empresa' className="form-label" >¿Cómo se llama tu empresa?</label>
@@ -88,11 +94,11 @@ export async function getServerSideProps(context: any) {
 function ActionButtons() {
   return <>
   <div >Export PDF button:
-                <button onClick={demoFromHTML}>Export PDF button</button>
-              </div>
-              <div>Send an email:
-                <button onClick={sendEmail}>Send email button</button>
-              </div>
+    <button onClick={demoFromHTML}>Export PDF button</button>
+  </div>
+  <div>Send an email:
+    <button onClick={sendEmail}>Send email button</button>
+  </div>
   </>;
 }
 
@@ -115,13 +121,10 @@ function Navbar() {
           </a>
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link" href="#">Dashboard</a>
+              <a className="nav-link" href="#">Empresas</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">Team</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">Projects</a>
+              <a className="nav-link" href="#">Mis proyectos</a>
             </li>
           </ul>
         </div>
@@ -152,12 +155,12 @@ function Navbar() {
           <div className="dropdown">
             <a className="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar"
               role="button" data-mdb-toggle="dropdown" aria-expanded="false">
-              <img src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp" className="rounded-circle" height="25"
-                alt="Black and White Portrait of a Man"  />
+              <img src="mini-retrato.webp" className="rounded-circle" height="25"
+                alt="Retrato del desarrollador"  />
             </a>
             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
               <li>
-                <a className="dropdown-item" href="#">My profile</a>
+                <a className="dropdown-item" href="#">Mi hoja de vida</a>
               </li>
               <li>
                 <a className="dropdown-item" href="#">Settings</a>
@@ -177,6 +180,9 @@ function Navbar() {
 export default function Home({
   isConnected,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [formVisible, setFormVisible] = useState(false);
+
+
   return (
     <div>
       <Head>
@@ -189,17 +195,17 @@ export default function Home({
         <div className="container-fluid">
           <div className="row">
             <div className="col-lg-6 vh-100">
-              <LoginForm></LoginForm>
+              <LoginForm onFormSubmit={() => setFormVisible(true)} ></LoginForm>
             </div>
+            {!formVisible &&
             <div className="col-lg-6 vh-100 bg-primary">
             </div>
-            <main>
-              <h1 className="title">
-                Regístrese para que le enviemos un montón de correo!
-              </h1>
-              
-
-              <RegistroEmpresarial></RegistroEmpresarial>
+            }
+            {formVisible &&
+            <div className="col-lg-6 vh-100">
+                <RegistroEmpresarial></RegistroEmpresarial>
+            </div>}
+            <main>              
               {false && <ActionButtons></ActionButtons>}
               {isConnected ? (
                 <div className="subtitle">You are connected to MongoDB</div>
