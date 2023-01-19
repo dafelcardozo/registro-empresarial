@@ -32,14 +32,15 @@ async function verifyLogin(props:LoginProps) {
 
 }
 
-type Company {
+type Company = {
   email: string,
   password: string,
   nombre: string, 
   nit: number,
   direccion: string,
   telefono: string
-}
+};
+
 
 async function postCompany(company:Company) {
   const resp = await axios.post('api/company', company);
@@ -66,8 +67,15 @@ const LoginForm = (props:formProps) => {
 }
 
 
-function RegistroEmpresarial(props:LoginProps) {
-  const {email, password} = props;
+
+type RegistroProps = {
+  login:LoginProps,
+  onCompanySubmitted: (company:Company) => void
+}
+
+function RegistroEmpresarial(props:RegistroProps) {
+  const {login, onCompanySubmitted} = props
+  const {email, password} = login;
   const [nombre, setNombre] = useState('');
   const [nit, setNit] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -228,6 +236,7 @@ export default function Home({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+
   return (
     <div>
       <Head>
@@ -253,7 +262,7 @@ export default function Home({
             }
             {formVisible &&
             <div className="col-lg-6 vh-100">
-                <RegistroEmpresarial email={email} password={password}></RegistroEmpresarial>
+                <RegistroEmpresarial login={{email, password}} onCompanySubmitted={(company) => postCompany(company)}></RegistroEmpresarial>
             </div>}
             <main>              
               {false && <ActionButtons></ActionButtons>}
