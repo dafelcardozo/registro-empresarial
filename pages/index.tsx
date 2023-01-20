@@ -3,7 +3,7 @@ import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
 import exportCompaniesToPDF from './export';
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
@@ -37,7 +37,6 @@ type RegistroProps = {
   onCompanySubmitted: (company:Company) => void
 }
 
-
 async function verifyLogin(props:LoginProps) {
   const {email, password} = props;
   const resp = await axios.post("api/verify", {email, password});
@@ -48,6 +47,13 @@ async function postCompany(company:Company){
   const resp = await axios.post('api/company', company);
   return resp.status == 200;
 }
+
+
+async function fetchCompanies() {
+  const resp = await axios.get("/api/companies");
+  return resp.data;
+};
+
 
 const LoginForm = (props:LoginFormProps) => {
   const {onLogin, onContinueRegistry} = props;
@@ -66,11 +72,11 @@ const LoginForm = (props:LoginFormProps) => {
     }
   }}>
     <div className="form-outline mb-4">
-      <input type="email" id="form1Example1" className="form-control" value={email} onChange={(event) => setEmail(event.target.value)}/>
+      <input type="email" id="form1Example1" className="form-control" value={email} required onChange={(event) => setEmail(event.target.value)}/>
       <label className="form-label" htmlFor="form1Example1">Email address</label>
     </div>
     <div className="form-outline mb-4">
-      <input type="password" id="form1Example2" className="form-control" onChange={(event) => setPassword(event.target.value)} />
+      <input type="password" id="form1Example2" className="form-control" required onChange={(event) => setPassword(event.target.value)} />
       <label className="form-label" htmlFor="form1Example2">Password</label>
     </div>
     <button type="submit" className="btn btn-primary btn-block" >Ingresar</button>
@@ -80,6 +86,12 @@ const LoginForm = (props:LoginFormProps) => {
         </div>}
   </form>
 }
+function isAxiosError(candidate: unknown): candidate is AxiosError {
+  if (candidate && typeof candidate === 'object' && 'isAxiosError' in candidate) {
+    return true;
+  }
+  return false;
+}
 
 function RegistroEmpresarial(props:RegistroProps) {
   const {login, onCompanySubmitted} = props
@@ -88,12 +100,27 @@ function RegistroEmpresarial(props:RegistroProps) {
   const [nit, setNit] = useState('');
   const [direccion, setDireccion] = useState('');
   const [telefono, setTelefono] = useState('');
+  const [showDuplicateNITError, setShowDuplicateNITError] = useState(false);
+
+
   return <form onSubmit={async (e) =>  {
-    e.preventDefault();
-    const company = {email, password, nombre, nit:parseInt(nit), direccion, telefono}
-    const result = await postCompany(company);
-    if (result)
-      onCompanySubmitted(company);
+    try {
+      e.preventDefault();
+      const company = {email, password, nombre, nit:parseInt(nit), direccion, telefono}
+      const result = await postCompany(company);
+      if (result)
+        onCompanySubmitted(company);
+    } catch (error:unknown) {
+      if (isAxiosError(error)) {
+        const err = error as AxiosError;
+        const data = err.response?.data as {error:string};
+        if (data.error === 'Duplicated NIT') {
+          setShowDuplicateNITError(true);
+          setTimeout(() => setShowDuplicateNITError(false), 4000);
+        }
+      } else 
+      console.error({error});
+    }
   }
 
   }>
@@ -104,29 +131,30 @@ function RegistroEmpresarial(props:RegistroProps) {
       <div >Correo electrónico: </div>
       <div>{email}</div>
       <div>Password: {password}</div>
-    
     </div>
- 
+
     <div className="form-outline mb-4">
       <label htmlFor='empresa' className="form-label" >¿Cómo se llama tu empresa?</label>
-      <input type='text' name='nombre' placeholder='Mi empresa' className="form-control" value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
+      <input type='text' name='nombre' placeholder='Mi empresa' className="form-control" required value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
 
     </div>
     <div className="form-outline mb-4">
       <label htmlFor='nit' className="form-label" >NIT o Número de Identificación Tributaria</label>
-      <input type='text' name='nit' placeholder='12345' className="form-control" value={nit} onChange={(e) => setNit(e.target.value)}></input>
-
+      <input type='number' name='nit' placeholder='12345' className="form-control" value={nit} required onChange={(e) => setNit(e.target.value)}></input>
     </div>
     <div className="form-outline mb-4">
       <label htmlFor='direccion' className="form-label">Dirección</label>
-      <input type='text' name="direccion" placeholder='Calle 123, Bogota' className="form-control" value={direccion} onChange={(e) => setDireccion(e.target.value)}></input>
+      <input type='textarea' name="direccion" placeholder='Calle 123, Bogota' className="form-control" required value={direccion} onChange={(e) => setDireccion(e.target.value)}></input>
     </div>
     <div className="form-outline mb-4">
       <label htmlFor='telefono' className="form-label" >Teléfono</label>
-      <input type='text' name='telefono' placeholder='+57 313 413 6320' className="form-control" value={telefono} onChange={(e) => setTelefono(e.target.value)}></input>
+      <input type='number' name='telefono' placeholder='3134136320' className="form-control" value={telefono} required onChange={(e) => setTelefono(e.target.value)}></input>
     </div>
     <button type="submit" className="btn btn-primary btn-block">Terminar registro</button>
     <button className="btn btn-secondary btn-block">Cancelar</button>
+    {showDuplicateNITError && <div className="alert alert-danger" role="alert">
+          NIT duplicado: hemos encontrado por lo menos un registro de empresa con el NIT {nit}.
+        </div>}
   </form>
 }
 
@@ -249,16 +277,11 @@ function ListadoEmpresas(props:Companies) {
       <td>{nit}</td>
       <td>{direccion}</td>
       <td>{telefono}</td>
-      <td><button >Eliminar</button></td>
+      <td><button ><i className="fa-solid fa-trash"></i></button></td>
       </tr>))}
       </tbody>
   </table></>
 }
-
-async function fetchCompanies() {
-  const resp = await axios.get("/api/companies");
-  return resp.data;
-};
 
 export default function Home({
   isConnected,

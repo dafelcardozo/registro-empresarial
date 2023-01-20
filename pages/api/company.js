@@ -45,7 +45,11 @@ export default async (req, res) => {
         const record = await db.collection('empresas').insertOne({ email, password, nombre, nit, direccion, telefono });
         res.json(record.insertedId);
     } catch (e) {
-        console.error(e);
-        res.status(500).json({error:e});
+        console.error({e});
+        if (e.code && e.code === 11000) {
+            res.status(500).json({error:'Duplicated NIT'});
+        } else {
+            res.status(500).json({error:e});
+        }
     }
 }
