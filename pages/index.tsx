@@ -8,6 +8,7 @@ import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
 import { stringify } from 'querystring';
+import { Cell } from 'jspdf-autotable';
 
 async function subscribe(email: string) {
   await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
@@ -200,9 +201,9 @@ export async function getServerSideProps(context: any) {
 }
 
 function ExportPDFButton() {
-  return <div >Export PDF button:
+  return <>
     <button onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></button>
-  </div>;
+  </>;
 }
 
 function Navbar() {
@@ -312,7 +313,7 @@ const OnClickEditor = (props: EditorProps) => {
         }}>OK</button>
         <button onClick={() => {
 
-          
+
           setValue(currentValue);
           setEditorVisible(false);
         }}>X</button>
@@ -330,11 +331,11 @@ type CellEditorProps = {
 function CellEditor(props: CellEditorProps) {
   const { field, record, onCellUpdated } = props;
 
-  return <OnClickEditor field={field} currentValue={record[field]} type={typeof (field)}
+  return <td><OnClickEditor field={field} currentValue={record[field]} type={typeof (field)}
     onFieldUpdated={async (field, newValue) => {
       await updateField(field, newValue, record.nit)
       onCellUpdated(newValue)}}
-  ></OnClickEditor>
+  ></OnClickEditor></td>
 }
 
 
@@ -343,31 +344,31 @@ function ListadoEmpresas(props: Companies) {
   const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
   const [isUpdateMessageVisible, setUpdateMessageVisible] = useState(false);
 
+  const cellUpdated = (company:Company) => {
+    onCompanyEdited(company);
+    setUpdateMessageVisible(true);
+    setTimeout(() => setUpdateMessageVisible(false), 4000);
+  };
   return <>
-    <ExportPDFButton />
+    <div>Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</div>
     <table className='table' id="listado_empresas">
       <thead>
         <tr>
+          <th>N.I.T.</th>
           <th>Nombre</th>
           <th>Email</th>
-          <th>N.I.T.</th>
           <th>Dirección</th>
           <th>Teléfono</th>
+          <th><ExportPDFButton /></th>
         </tr>
       </thead>
       <tbody>
         {list.map((company) => (<tr key={company.nit}>
-          <td>
-            <CellEditor field='nombre' record={company} onCellUpdated={() => {
-              onCompanyEdited(company);
-              setUpdateMessageVisible(true);
-              setTimeout(() => setUpdateMessageVisible(false), 4000);
-              }} />
-          </td>
-          <td>{company.email}</td>
           <td>{company.nit}</td>
-          <td>{company.direccion}</td>
-          <td>{company.telefono}</td>
+          <CellEditor field='nombre' record={company} onCellUpdated={() => cellUpdated(company)} />
+          <CellEditor field='email' record={company} onCellUpdated={() => cellUpdated(company)} />
+          <CellEditor field='direccion' record={company} onCellUpdated={() => cellUpdated(company)} />
+          <CellEditor field='telefono' record={company} onCellUpdated={() => cellUpdated(company)} />
           <td><button onClick={async () => {
             await deleteCompany(company);
             onCompanyDeleted(company);
