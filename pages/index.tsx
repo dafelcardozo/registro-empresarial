@@ -147,7 +147,7 @@ export async function getServerSideProps(context: any) {
 
 function ExportPDFButton() {
   return  <div >Export PDF button:
-    <button onClick={exportCompaniesToPDF}>Export PDF button</button>
+    <button onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></button>
   </div>;
 }
 

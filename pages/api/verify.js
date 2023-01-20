@@ -5,7 +5,7 @@ export default async (req, res) => {
     try {
         const { email, password } = req.body
         const client = await clientPromise;
-        const db = client.db("registro-empresaria");
+        const db = client.db("registro-empresarial");
         const record = await db.collection('empresas')
         .findOne({email, password});
         res.json(record);
