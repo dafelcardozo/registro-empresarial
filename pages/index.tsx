@@ -34,7 +34,8 @@ type Company = {
 
 type RegistroProps = {
   login:LoginProps,
-  onCompanySubmitted: (company:Company) => void
+  onCompanySubmitted: (company:Company) => void,
+  onCancel: () => void
 }
 
 async function verifyLogin(props:LoginProps) {
@@ -94,7 +95,7 @@ function isAxiosError(candidate: unknown): candidate is AxiosError {
 }
 
 function RegistroEmpresarial(props:RegistroProps) {
-  const {login, onCompanySubmitted} = props
+  const {login, onCompanySubmitted, onCancel} = props
   const {email, password} = login;
   const [nombre, setNombre] = useState('');
   const [nit, setNit] = useState('');
@@ -151,7 +152,7 @@ function RegistroEmpresarial(props:RegistroProps) {
       <input type='number' name='telefono' placeholder='3134136320' className="form-control" value={telefono} required onChange={(e) => setTelefono(e.target.value)}></input>
     </div>
     <button type="submit" className="btn btn-primary btn-block">Terminar registro</button>
-    <button className="btn btn-secondary btn-block">Cancelar</button>
+    <button type="button" className="btn btn-secondary btn-block" onClick={onCancel}>Cancelar</button>
     {showDuplicateNITError && <div className="alert alert-danger" role="alert">
           NIT duplicado: hemos encontrado por lo menos un registro de empresa con el NIT {nit}.
         </div>}
@@ -330,7 +331,7 @@ export default function Home({
                 <RegistroEmpresarial login={{email, password}} onCompanySubmitted={(company) => {
                   setSplitPanelVisible(false); 
                   setMyCompany(company);
-                  }} ></RegistroEmpresarial>
+                  }} onCancel={() => setSplitPanelVisible(false)}></RegistroEmpresarial>
             </div>}
             <main>              
               {false && <ExportPDFButton></ExportPDFButton>}
