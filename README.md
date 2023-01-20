@@ -1,7 +1,7 @@
 # Registro Empresarial - una demo para Lite Thinking
 ## Bienvenidos!
 
-[Registro-empresarial](https://www.mongodb.com/) es una aplicación de demo de mis habilidades con React y Node, desarrollada como mi respuesta a una prueba técnica de Lite Thinking.
+[Registro-empresarial](https://contacto-empresas-felipe-c.vercel.app/) es una aplicación de demo de mis habilidades con React y Node, desarrollada como mi respuesta a una prueba técnica de Lite Thinking.
 
 A continuación hago un breve resumen de las tecnologías utilizadas y entrego uno que otro detalle sobre su arquitectura y construcción.
 
@@ -15,7 +15,7 @@ Los distintos artifactos fueron escritos en lenguajes [Typescript](https://www.t
 
 ### Despliegue en la nube
 
-Esta aplicación fue desplegada al mundo en el servicio de nube pública [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example). Vercel utiliza la red de AWS para la mayoría de artefactos de nube.
+Esta aplicación fue desplegada al mundo en el servicio de nube pública [Vercel](https://vercel.com). Vercel utiliza la red de AWS para la mayoría de artefactos de nube.
 
 ### Base de datos
 
@@ -27,7 +27,7 @@ __Registro-empresarial__ utiliza como motor de correo electrónico y gestor de c
 
 ### Look & field
 
-El aspecto visual de la aplicación fue construído con el popular framework para CSS [MDB Bootstrap](https://mdbootstrap.com/), y una que otra foto encontrada en la web (agradecimientos a sus creadores).
+El aspecto visual de la aplicación fue construído con el popular framework para CSS [MDB Bootstrap](https://mdbootstrap.com/), y una que otra foto encontrada en la web. Agradecimientos a sus creadores.
 
 ### Generador de PDFs
 
@@ -76,7 +76,7 @@ Estos son:
 - acciones o accesos al API con __Axios__
 ![Axios calls](public/capture4.png)
 
-La colección en base de datos tiene una restricción de unicidad por NIT (Número de Identificación Tributario).
+La colección en base de datos tiene una restricción de unicidad por NIT, Número de Identificación Tributario.
  
 
 # ¡Gracias por haberme leído hasta aquí!
