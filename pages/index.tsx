@@ -54,6 +54,11 @@ async function fetchCompanies() {
   return resp.data;
 }
 
+async function deleteCompany(company:Company) {
+  const resp = await axios.post("/api/delete", company);
+  return resp.data;
+}
+
 
 const LoginForm = (props: LoginFormProps) => {
   const { onLogin, onContinueRegistry } = props;
@@ -168,7 +173,7 @@ function RegistroEmpresarial(props: RegistroProps) {
         <button type="submit" className="btn btn-primary btn-block">Terminar registro</button>
       </div>
       <div className='col'>
-        <button type="button" className="btn btn-secondary btn-block" onClick={onCancel}>Cancelar</button>
+        <button type="button" className="btn btn-secondary btn-block" onClick={onCancel}>Ya no quiero, cancelar</button>
       </div>
     </div>
     
@@ -274,11 +279,14 @@ function Navbar() {
 }
 
 type Companies = {
-  list: Company[]
+  list: Company[],
+  onCompanyDeleted: (company:Company) => void
 };
 
 function ListadoEmpresas(props: Companies) {
-  const { list } = props;
+  const { list, onCompanyDeleted } = props;
+  const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
+
   return <>
     <ExportPDFButton />
     <table className='table' id="listado_empresas">
@@ -298,10 +306,22 @@ function ListadoEmpresas(props: Companies) {
           <td>{nit}</td>
           <td>{direccion}</td>
           <td>{telefono}</td>
-          <td><button ><i className="fa-solid fa-trash"></i></button></td>
+          <td><button onClick={async () => {
+            const company = { email, password:'', nombre, nit, direccion, telefono };
+            await deleteCompany(company);
+            onCompanyDeleted(company);
+            setDeleteMessageVisible(true);
+            setTimeout(() => setDeleteMessageVisible(false), 4000);
+          }}><i className="fa-solid fa-trash"></i></button></td>
         </tr>))}
       </tbody>
-    </table></>
+    </table>
+
+    {isDeleteMessageVisible && <div className="alert alert-success" role="alert">
+      Se eliminó la empresa dssaasdasdasd.
+    </div>}
+    
+    </>
 }
 
 
@@ -377,7 +397,10 @@ export default function Home({
                 <main>
                   <div className="col-lg-6 vh-100">
                     <h2>Bienvenido {myCompany.nombre}!</h2>
-                    <ListadoEmpresas list={companies} />
+                    <ListadoEmpresas list={companies} onCompanyDeleted={async (company)=>{
+                      const companies = await fetchCompanies();
+                      setCompanies(companies);
+                    }}/>
                   </div>
                 </main>
 
