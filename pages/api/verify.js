@@ -11,6 +11,6 @@ export default async (req, res) => {
         res.json(record);
     } catch (e) {
         console.error(e);
-        res.json(false);
+        res.status(500).json(false);
     }
   }

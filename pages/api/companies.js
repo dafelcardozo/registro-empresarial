@@ -8,7 +8,6 @@ export default async (req, res) => {
            .collection("empresas")
            .find({})
            .toArray();
-
        res.json(empresas);
    } catch (e) {
        console.error(e);

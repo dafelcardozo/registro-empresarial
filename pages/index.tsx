@@ -46,12 +46,18 @@ async function postCompany(company:Company){
 const LoginForm = (props:LoginFormProps) => {
   const {onLogin, onContinueRegistry} = props;
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('')
+  const [password, setPassword] = useState('');
+  const [fallidoVisible, setFallidoVisible] = useState(false);
+
   return <form onSubmit={async (event) => {
     event.preventDefault();
     const company = await verifyLogin({email, password});
-    if (company)
+    if (company) 
       onLogin(company);
+    else {
+      setFallidoVisible(true);
+      setTimeout(() => {setFallidoVisible(false)}, 4000);
+    }
   }}>
     <div className="form-outline mb-4">
       <input type="email" id="form1Example1" className="form-control" value={email} onChange={(event) => setEmail(event.target.value)}/>
@@ -63,6 +69,9 @@ const LoginForm = (props:LoginFormProps) => {
     </div>
     <button type="submit" className="btn btn-primary btn-block" >Ingresar</button>
     <button type="button" className='btn btn-secondary btn-block' onClick={() => onContinueRegistry(email, password)}>Registrarme</button>
+    {fallidoVisible && <div className="alert alert-danger" role="alert">
+          Ingreso fallido: no encontramos una combinación de correo y contraseña correspondientes a las que ingresaste.
+        </div>}
   </form>
 }
 
@@ -124,16 +133,7 @@ function RegistroEmpresarial(props:RegistroProps) {
 
 export async function getServerSideProps(context: any) {
   try {
-    await clientPromise
-    // `await clientPromise` will use the default database passed in the MONGODB_URI
-    // However you can use another database (e.g. myDatabase) by replacing the `await clientPromise` with the following code:
-    //
-    // `const client = await clientPromise`
-    // `const db = client.db("myDatabase")`
-    //
-    // Then you can execute queries against your database like so:
-    // db.find({}) or any of the MongoDB Node Driver commands
-
+    await clientPromise;
     return {
       props: { isConnected: true },
     }
@@ -145,15 +145,10 @@ export async function getServerSideProps(context: any) {
   }
 }
 
-function ActionButtons() {
-  return <>
-  <div >Export PDF button:
+function ExportPDFButton() {
+  return  <div >Export PDF button:
     <button onClick={demoFromHTML}>Export PDF button</button>
-  </div>
-  <div>Send an email:
-    <button onClick={() => subscribe('')}>Send email button</button>
-  </div>
-  </>;
+  </div>;
 }
 
 function Navbar() {
@@ -169,9 +164,8 @@ function Navbar() {
         </button>
   
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <a className="navbar-brand mt-2 mt-lg-0" href="#">
-            <img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="15" alt="MDB Logo"
-         />
+          <a className="navbar-brand mt-2 mt-lg-0" href="#" style={{backgroundColor:"black"}}>
+            <img src="Logo_Lite_Thinking_Sin_Fondo_1.png" alt="Lite Thinking" width="60"/>
           </a>
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
@@ -237,7 +231,9 @@ type Companies = {
 
 function ListadoEmpresas(props:Companies) {
   const {list} = props;
-  return <table className='table'>
+  return <>
+  <ExportPDFButton />
+  <table className='table'>
     <thead>
       <tr>
         <th>Nombre</th>
@@ -257,7 +253,7 @@ function ListadoEmpresas(props:Companies) {
       <td><button >Eliminar</button></td>
       </tr>))}
       </tbody>
-  </table>
+  </table></>
 }
 
 async function fetchCompanies() {
@@ -315,7 +311,7 @@ export default function Home({
                   setMyCompany(company)}} ></RegistroEmpresarial>
             </div>}
             <main>              
-              {false && <ActionButtons></ActionButtons>}
+              {false && <ExportPDFButton></ExportPDFButton>}
               {isConnected ? (
                 <div className="subtitle">You are connected to MongoDB</div>
               ) : (
@@ -328,6 +324,7 @@ export default function Home({
             </main>
           </div>
               }
+              {!splitPanelVisible && 
               <div className="row">
                 <main>
                 <div className="col-lg-6 vh-100">
@@ -335,7 +332,7 @@ export default function Home({
                   <ListadoEmpresas list={companies} />
                   </div>
                 </main>
-              </div>
+              </div>}
         </div>
       </section>
     </div>
