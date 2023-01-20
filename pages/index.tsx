@@ -7,6 +7,7 @@ import axios, { AxiosError } from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
+import { stringify } from 'querystring';
 
 async function subscribe(email: string) {
   await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
@@ -54,7 +55,7 @@ async function fetchCompanies() {
   return resp.data;
 }
 
-async function deleteCompany(company:Company) {
+async function deleteCompany(company: Company) {
   const resp = await axios.post("/api/delete", company);
   return resp.data;
 }
@@ -93,7 +94,7 @@ const LoginForm = (props: LoginFormProps) => {
     <div className="row">
       <div className="col"><button type="submit" className="btn btn-primary btn-block" >Ingresar</button></div>
       <div className="col"><button type="button" className='btn btn-secondary btn-block' onClick={() => onContinueRegistry(email, password)}>Registrarme</button></div>
-    </div>  
+    </div>
     {fallidoVisible && <div className="alert alert-danger" role="alert">
       Ingreso fallido: no encontramos una combinación de correo y contraseña correspondientes a las que ingresaste.
     </div>}
@@ -176,8 +177,8 @@ function RegistroEmpresarial(props: RegistroProps) {
         <button type="button" className="btn btn-secondary btn-block" onClick={onCancel}>Ya no quiero, cancelar</button>
       </div>
     </div>
-    
-    
+
+
     {showDuplicateNITError && <div className="alert alert-danger" role="alert">
       NIT duplicado: hemos encontrado por lo menos un registro de empresa con el NIT {nit}.
     </div>}
@@ -280,12 +281,67 @@ function Navbar() {
 
 type Companies = {
   list: Company[],
-  onCompanyDeleted: (company:Company) => void
+  onCompanyDeleted: (company: Company) => void
+  onCompanyEdited: (company: Company) => void
 };
 
+type EditorProps = {
+  field: string,
+  currentValue: any,
+  type: string,
+  onFieldUpdated: (field: string, newValue: any) => void
+}
+
+async function updateField(field: string, newValue: any, key: number) {
+  const resp = await axios.post("api/update", { field, newValue, key });
+  return resp.data;
+}
+
+const OnClickEditor = (props: EditorProps) => {
+  const { field, currentValue, type, onFieldUpdated } = props;
+  const [editorVisible, setEditorVisible] = useState(false);
+  const [value, setValue] = useState(currentValue);
+  return <>
+    {!editorVisible && <div onClick={() => {setEditorVisible(true)}}>{currentValue}</div>}
+    {editorVisible &&
+      <div>
+        <input type={type} value={value} onChange={(e) => setValue(e.target.value)} />
+        <button onClick={async () => {
+          setEditorVisible(false);
+          onFieldUpdated(field, value);
+        }}>OK</button>
+        <button onClick={() => {
+
+          
+          setValue(currentValue);
+          setEditorVisible(false);
+        }}>X</button>
+      </div>}
+  </>
+};
+
+
+type CellEditorProps = {
+  field: 'nombre' | 'direccion' | 'telefono' | 'email',
+  record: Company,
+  onCellUpdated: (newValue: any) => void,
+}
+
+function CellEditor(props: CellEditorProps) {
+  const { field, record, onCellUpdated } = props;
+
+  return <OnClickEditor field={field} currentValue={record[field]} type={typeof (field)}
+    onFieldUpdated={async (field, newValue) => {
+      await updateField(field, newValue, record.nit)
+      onCellUpdated(newValue)}}
+  ></OnClickEditor>
+}
+
+
 function ListadoEmpresas(props: Companies) {
-  const { list, onCompanyDeleted } = props;
+  const { list, onCompanyDeleted, onCompanyEdited } = props;
   const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
+  const [isUpdateMessageVisible, setUpdateMessageVisible] = useState(false);
 
   return <>
     <ExportPDFButton />
@@ -300,14 +356,19 @@ function ListadoEmpresas(props: Companies) {
         </tr>
       </thead>
       <tbody>
-        {list.map(({ nombre, email, nit, direccion, telefono }) => (<tr key={nit}>
-          <td>{nombre}</td>
-          <td>{email}</td>
-          <td>{nit}</td>
-          <td>{direccion}</td>
-          <td>{telefono}</td>
+        {list.map((company) => (<tr key={company.nit}>
+          <td>
+            <CellEditor field='nombre' record={company} onCellUpdated={() => {
+              onCompanyEdited(company);
+              setUpdateMessageVisible(true);
+              setTimeout(() => setUpdateMessageVisible(false), 4000);
+              }} />
+          </td>
+          <td>{company.email}</td>
+          <td>{company.nit}</td>
+          <td>{company.direccion}</td>
+          <td>{company.telefono}</td>
           <td><button onClick={async () => {
-            const company = { email, password:'', nombre, nit, direccion, telefono };
             await deleteCompany(company);
             onCompanyDeleted(company);
             setDeleteMessageVisible(true);
@@ -320,8 +381,11 @@ function ListadoEmpresas(props: Companies) {
     {isDeleteMessageVisible && <div className="alert alert-success" role="alert">
       Se eliminó la empresa dssaasdasdasd.
     </div>}
-    
-    </>
+    {isUpdateMessageVisible && <div className="alert alert-success" role="alert">
+      Se actualizó exitosamente el campo de la campañía.
+    </div>}
+
+  </>
 }
 
 
@@ -397,10 +461,16 @@ export default function Home({
                 <main>
                   <div className="col-lg-6 vh-100">
                     <h2>Bienvenido {myCompany.nombre}!</h2>
-                    <ListadoEmpresas list={companies} onCompanyDeleted={async (company)=>{
-                      const companies = await fetchCompanies();
-                      setCompanies(companies);
-                    }}/>
+                    <ListadoEmpresas
+                      list={companies}
+                      onCompanyDeleted={async (company) => {
+                        const companies = await fetchCompanies();
+                        setCompanies(companies);
+                      }}
+                      onCompanyEdited={async (company) => {
+                        const companies = await fetchCompanies();
+                        setCompanies(companies);
+                      }} />
                   </div>
                 </main>
 
