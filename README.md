@@ -76,7 +76,7 @@ Estos son:
 - acciones o accesos al API con __Axios__
 ![Axios calls](public/capture4.png)
 
-La colección en base de datos tiene una restricción de unicidad por NIT (Número de Identificaión Tributario).
+La colección en base de datos tiene una restricción de unicidad por NIT (Número de Identificación Tributario).
  
 
 # ¡Gracias por haberme leído hasta aquí!
