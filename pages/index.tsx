@@ -202,15 +202,14 @@ export async function getServerSideProps(context: any) {
 
 function ExportPDFButton() {
   return <>
-    <button onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></button>
+    <a href="#" data-mdb-toggle="tooltip" title="Exportar a PDF"onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></a>
   </>;
 }
 
 function Navbar() {
   return <>
     <header>
-
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
           <button className="navbar-toggler" type="button" data-mdb-toggle="collapse"
             data-mdb-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -219,15 +218,12 @@ function Navbar() {
           </button>
 
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <a className="navbar-brand mt-2 mt-lg-0" href="#" style={{ backgroundColor: "black" }}>
+            <a className="navbar-brand mt-2 mt-lg-0" href="/" >
               <img src="Logo_Lite_Thinking_Sin_Fondo_1.png" alt="Lite Thinking" width="60" />
             </a>
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a className="nav-link" href="Felipe Cardozo - English CV 2023.pdf">Descarga mi hoja de vida</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">Listado de empresas</a>
+                <a className="nav-link" href="Felipe Cardozo - English CV 2023.pdf">Hoja de vida</a>
               </li>
             </ul>
           </div>
@@ -303,7 +299,7 @@ const OnClickEditor = (props: EditorProps) => {
   const [editorVisible, setEditorVisible] = useState(false);
   const [value, setValue] = useState(currentValue);
   return <>
-    {!editorVisible && <div onClick={() => {setEditorVisible(true)}}>{currentValue}</div>}
+    {!editorVisible && <div onClick={() => { setEditorVisible(true) }}>{currentValue}</div>}
     {editorVisible &&
       <div>
         <input type={type} value={value} onChange={(e) => setValue(e.target.value)} />
@@ -334,7 +330,8 @@ function CellEditor(props: CellEditorProps) {
   return <td><OnClickEditor field={field} currentValue={record[field]} type={typeof (field)}
     onFieldUpdated={async (field, newValue) => {
       await updateField(field, newValue, record.nit)
-      onCellUpdated(newValue)}}
+      onCellUpdated(newValue)
+    }}
   ></OnClickEditor></td>
 }
 
@@ -344,13 +341,15 @@ function ListadoEmpresas(props: Companies) {
   const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
   const [isUpdateMessageVisible, setUpdateMessageVisible] = useState(false);
 
-  const cellUpdated = (company:Company) => {
+  const cellUpdated = (company: Company) => {
     onCompanyEdited(company);
     setUpdateMessageVisible(true);
     setTimeout(() => setUpdateMessageVisible(false), 4000);
   };
   return <>
-    <div>Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</div>
+    <div className="card" style={{width: "1000px"}}>
+      <div className="card-body" >
+        <div>Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</div>
     <table className='table' id="listado_empresas">
       <thead>
         <tr>
@@ -369,12 +368,12 @@ function ListadoEmpresas(props: Companies) {
           <CellEditor field='email' record={company} onCellUpdated={() => cellUpdated(company)} />
           <CellEditor field='direccion' record={company} onCellUpdated={() => cellUpdated(company)} />
           <CellEditor field='telefono' record={company} onCellUpdated={() => cellUpdated(company)} />
-          <td><button onClick={async () => {
-            await deleteCompany(company);
-            onCompanyDeleted(company);
-            setDeleteMessageVisible(true);
-            setTimeout(() => setDeleteMessageVisible(false), 4000);
-          }}><i className="fa-solid fa-trash"></i></button></td>
+          <td><a href="#" data-mdb-toggle="tooltip" title="Elimina la compañía" onClick={async () => {
+              await deleteCompany(company);
+              onCompanyDeleted(company);
+              setDeleteMessageVisible(true);
+              setTimeout(() => setDeleteMessageVisible(false), 4000);
+            }}><i className="fa-solid fa-trash"></i></a></td>
         </tr>))}
       </tbody>
     </table>
@@ -385,6 +384,10 @@ function ListadoEmpresas(props: Companies) {
     {isUpdateMessageVisible && <div className="alert alert-success" role="alert">
       Se actualizó exitosamente el campo de la campañía.
     </div>}
+      </div>
+    </div>
+
+    
 
   </>
 }
@@ -425,24 +428,29 @@ export default function Home({
         <title>Registro empresarial</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar></Navbar>
+      {!splitPanelVisible && <Navbar></Navbar>}
       <section>
         {splitPanelVisible && <div className="container-fluid">
           <div className="row">
             <div className="col-lg-6 vh-100">
-              <LoginForm onContinueRegistry={(email, password) => {
-                setShowRegisterForm(true);
-                setSplitPanelVisible(false);
-                setEmail(email);
-                setPassword(password);
-              }} onLogin={(company) => {
-                setSplitPanelVisible(false);
-                setShowRegisterForm(false);
-                setMyCompany(company);
-              }}></LoginForm>
+              <div className="card">
+                <div className="card-body">
+                  <LoginForm onContinueRegistry={(email, password) => {
+                    setShowRegisterForm(true);
+                    setSplitPanelVisible(false);
+                    setEmail(email);
+                    setPassword(password);
+                  }} onLogin={(company) => {
+                    setSplitPanelVisible(false);
+                    setShowRegisterForm(false);
+                    setMyCompany(company);
+                  }}></LoginForm>
+                </div>
+              </div>
+
             </div>
             <div className="col-lg-6 vh-100">
-              <img src='esplanade-louvre.webp' style={{ width: "100%" }}></img>
+              <img src='esplanade-louvre.webp' className="w-100" ></img>
             </div>
           </div>
         </div>
