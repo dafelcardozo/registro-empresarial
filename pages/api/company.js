@@ -43,6 +43,7 @@ export default async (req, res) => {
         const { email, password, nombre, nit, direccion, telefono } = req.body;
         const db = client.db("registro-empresarial");
         const record = await db.collection('empresas').insertOne({ email, password, nombre, nit, direccion, telefono });
+        await subscribe(email);
         res.json(record.insertedId);
     } catch (e) {
         console.error({e});
