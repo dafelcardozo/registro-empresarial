@@ -1,82 +1,82 @@
-## Example app using MongoDB
+# Registro Empresarial - una demo para Lite Thinking
+## Bienvenidos!
 
-[MongoDB](https://www.mongodb.com/) is a general purpose, document-based, distributed database built for modern application developers and for the cloud era. This example will show you how to connect to and use MongoDB as your backend for your Next.js app.
+[Registro-empresarial](https://www.mongodb.com/) es una aplicación de demo de mis habilidades con React y Node, desarrollada como mi respuesta a una prueba técnica de Lite Thinking.
 
-If you want to learn more about MongoDB, visit the following pages:
+A continuación hago un breve resumen de las tecnologías utilizadas y entrego uno que otro detalle sobre su arquitectura y construcción.
 
-- [MongoDB Atlas](https://mongodb.com/atlas)
-- [MongoDB Documentation](https://docs.mongodb.com/)
+## Tecnologías utilizadas
 
-## Deploy your own
+### Lenguajes de programación
 
-Once you have access to the environment variables you'll need, deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
+__Registro-empresarial__ es una aplicación para [Next.js](https://nextjs.org/), un popular framework en [React](https://reactjs.org/) y [Node.js](https://nodejs.org).
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=with-mongodb&repository-name=with-mongodb&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-mongodb&integration-ids=oac_jnzmjqM10gllKmSrG0SGrHOH)
+Los distintos artifactos fueron escritos en lenguajes [Typescript](https://www.typescriptlang.org/) y [Javascript](https://www.javascript.com/).
 
-## How to use
+### Despliegue en la nube
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
+Esta aplicación fue desplegada al mundo en el servicio de nube pública [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example). Vercel utiliza la red de AWS para la mayoría de artefactos de nube.
 
-```bash
-npx create-next-app --example with-mongodb with-mongodb-app
-```
+### Base de datos
 
-```bash
-yarn create next-app --example with-mongodb with-mongodb-app
-```
+__Registro-empresarial__ utiliza una base de datos [MongoDB](https://www.mongodb.com/), desplegada en el servicio de nube [MongoDB Atlas](https://mongodb.com/atlas).
 
-```bash
-pnpm create next-app --example with-mongodb with-mongodb-app
-```
+### Motor de correo electrónico
 
-## Configuration
+__Registro-empresarial__ utiliza como motor de correo electrónico y gestor de campañas de correo, al servicio de nube líder en ese mercado, [MailChimp](https://mailchimp.com/).
 
-### Set up a MongoDB database
+### Look & field
 
-Set up a MongoDB database either locally or with [MongoDB Atlas for free](https://mongodb.com/atlas).
+El aspecto visual de la aplicación fue construído con el popular framework para CSS [MDB Bootstrap](https://mdbootstrap.com/), y una que otra foto encontrada en la web (agradecimientos a sus creadores).
 
-### Set up environment variables
+### Generador de PDFs
 
-Copy the `env.local.example` file in this directory to `.env.local` (which will be ignored by Git):
+__Registro-empresarial__ genera los PDFs del listado de empresas a través de las librerías y [jspdf](https://github.com/parallax/jsPDF) y [jspdf-autotable](https://simonbengtsson.github.io/jsPDF-AutoTable/).
 
-```bash
-cp .env.local.example .env.local
-```
+## Desarrollo local
 
-Set each variable on `.env.local`:
+### Variables de entorno
 
-- `MONGODB_URI` - Your MongoDB connection string. If you are using [MongoDB Atlas](https://mongodb.com/atlas) you can find this by clicking the "Connect" button for your cluster.
+La aplicación requiere de varias variables de entorno:
 
-### Run Next.js in development mode
+- `MONGODB_URI` - La cadena de conexión con su instancia de MongoDB, puede ser una local en su equipo de desarrollo o en la nube de [MongoDB Atlas](https://mongodb.com/atlas). Para un mayor detalle sobre esta cadena, por favor visite esta página: [MongoDB Node.js Driver](https://mongodb.github.io/node-mongodb-native/3.4/tutorials/collections/).
+-  `MAILCHIMP_API_KEY`, `MAILCHIMP_AUDIENCE_ID` y `MAILCHIMP_API_SERVER` - Llaves y URLs de conexión con [MailChimp](https://mailchimp.com/). Para un mayor detalle sobre estas variables, por favor visita esta página: 
+
+Puedes colocar las variables de entorno en tu interpréte de terminal, o mejor, en un archivo `.env.local` a la raíz de tu repo cloneado. El archivo no pasa por Git.
+
+### Comandos
+
+Después de haber cloneado este repositorio y configurado las variables de entorno requeridas, puedes correrla localmente con los comandos:
 
 ```bash
 npm install
 npm run dev
 
-# or
+# o
 
 yarn install
 yarn dev
 ```
 
-Your app should be up and running on [http://localhost:3000](http://localhost:3000)! If it doesn't work, post on [GitHub discussions](https://github.com/vercel/next.js/discussions).
+La aplicación corre en [http://localhost:3000](http://localhost:3000).
 
-You will either see a message stating "You are connected to MongoDB" or "You are NOT connected to MongoDB". Ensure that you have provided the correct `MONGODB_URI` environment variable.
+## Arquitectura y artefactos
 
-When you are successfully connected, you can refer to the [MongoDB Node.js Driver docs](https://mongodb.github.io/node-mongodb-native/3.4/tutorials/collections/) for further instructions on how to query your database.
+Esta aplicación utiliza [Next.js](https://nextjs.org/) como framework de código, y reparte sus componentes acorde con lo especificado por Next.
 
-## Deploy on Vercel
+Estos son:
 
-You can deploy this app to the cloud with [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+- el archivo __package.json__  con instrucciones de descarga y contrucción para __Node__ y __NPM__.
+- archivos con código [Node.js](https://nodejs.org) en Javascript para la generación del API interno en la carpeta _pages/api_.
+![Funciones API Node](public/capture1.png)
+- fragmentos de __JSX__ y __TSX__ con [React Hooks](https://reactjs.org/docs/hooks-intro.html).
+![Fragmentos React Hooks](public/capture2.png)
+- _tipos_ en Typescript.
+![Tipos](public/capture3.png)
+- acciones o accesos al API con __Axios__
+![Axios calls](public/capture4.png)
 
-#### Deploy Your Local Project
+La colección en base de datos tiene una restricción de unicidad por NIT (Número de Identificaión Tributario).
+ 
 
-To deploy your local project to Vercel, push it to GitHub/GitLab/Bitbucket and [import to Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example).
-
-**Important**: When you import your project on Vercel, make sure to click on **Environment Variables** and set them to match your `.env.local` file.
-
-#### Deploy from Our Template
-
-Alternatively, you can deploy using our template by clicking on the Deploy button below.
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?project-name=with-mongodb&repository-name=with-mongodb&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-mongodb&integration-ids=oac_jnzmjqM10gllKmSrG0SGrHOH)
+# ¡Gracias por haberme leído hasta aquí!
