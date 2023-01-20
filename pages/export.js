@@ -4,7 +4,7 @@ import autoTable from 'jspdf-autotable'
 
 
 export default function exportCompaniesToPDF() {
-    
+    if (process.browser) {
     const pdf = new jsPDF('l', 'pt', 'a0');
     /*
     const specialElementHandlers = {
@@ -32,12 +32,12 @@ export default function exportCompaniesToPDF() {
           1: {columnWidth: 'auto'}
         }
       });
-    
+      
       var iframe = document.createElement('iframe');
       iframe.setAttribute('style', 'position:absolute;top:0;right:0;height:100%; width:600px');
       document.body.appendChild(iframe);
       iframe.src = pdf.output('datauristring');
-      
+    }
       /*
     pdf.html(
         document.getElementById("listado_empresas"), {
