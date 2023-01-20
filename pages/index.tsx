@@ -6,7 +6,7 @@ import demoFromHTML from './export';
 import axios from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 async function subscribe(email:string) {
   await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
@@ -16,20 +16,16 @@ type LoginProps = {
   password: string
 };
 
-type formProps = {
-  onFormSubmit: (email:string, password:string) => void,
+type LoginFormProps = {
+  onLogin: (company:Company) => void,
+  onContinueRegistry: (email:string, password: string) => void
 }
 
 
 async function verifyLogin(props:LoginProps) {
   const {email, password} = props;
   const resp = await axios.post("api/verify", {email, password});
-  if (resp.status == 200) {
-    console.info('Accepted');
-  } else {
-    console.info('Rejected');
-  }
-
+  return resp.data;
 }
 
 type Company = {
@@ -42,17 +38,21 @@ type Company = {
 };
 
 
-async function postCompany(company:Company) {
+async function postCompany(company:Company){
   const resp = await axios.post('api/company', company);
-  console.info('Okay!')
+  return resp.status == 200;
 }
 
-const LoginForm = (props:formProps) => {
-  const {onFormSubmit} = props;
+const LoginForm = (props:LoginFormProps) => {
+  const {onLogin, onContinueRegistry} = props;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('')
-  return <form onSubmit={(event) => {event.preventDefault();
-                                onFormSubmit(email, password);}}>
+  return <form onSubmit={async (event) => {
+    event.preventDefault();
+    const company = await verifyLogin({email, password});
+    if (company)
+      onLogin(company);
+  }}>
     <div className="form-outline mb-4">
       <input type="email" id="form1Example1" className="form-control" value={email} onChange={(event) => setEmail(event.target.value)}/>
       <label className="form-label" htmlFor="form1Example1">Email address</label>
@@ -62,7 +62,7 @@ const LoginForm = (props:formProps) => {
       <label className="form-label" htmlFor="form1Example2">Password</label>
     </div>
     <button type="submit" className="btn btn-primary btn-block" >Ingresar</button>
-    <button type="submit" className='btn btn-secondary btn-block'>Registrarme</button>
+    <button type="button" className='btn btn-secondary btn-block' onClick={() => onContinueRegistry(email, password)}>Registrarme</button>
   </form>
 }
 
@@ -82,8 +82,10 @@ function RegistroEmpresarial(props:RegistroProps) {
   const [telefono, setTelefono] = useState('');
   return <form onSubmit={async (e) =>  {
     e.preventDefault();
-    await postCompany({email, password, nombre, nit:parseInt(nit), direccion, telefono});
-    
+    const company = {email, password, nombre, nit:parseInt(nit), direccion, telefono}
+    const result = await postCompany(company);
+    if (result)
+      onCompanySubmitted(company);
   }
 
   }>
@@ -229,12 +231,55 @@ function Navbar() {
     </>
 }
 
+type Companies = {
+  list: Company[]
+};
+
+function ListadoEmpresas(props:Companies) {
+  const {list} = props;
+  return <table className='table'>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>N.I.T.</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
+      </tr>
+    </thead>
+      <tbody>
+    {list.map(({nombre, email, nit, direccion, telefono}) => (<tr key={nit}>
+      <td>{nombre}</td>
+      <td>{email}</td>
+      <td>{nit}</td>
+      <td>{direccion}</td>
+      <td>{telefono}</td>
+      <td><button >Eliminar</button></td>
+      </tr>))}
+      </tbody>
+  </table>
+}
+
+async function fetchCompanies() {
+  const resp = await axios.get("/api/companies");
+  return resp.data;
+};
+
 export default function Home({
   isConnected,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [splitPanelVisible, setSplitPanelVisible] = useState(true);
   const [formVisible, setFormVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [companies, setCompanies] = useState([]);
+  const [myCompany, setMyCompany] = useState({nombre:''});
+
+  useEffect( () => {
+    if (companies.length === 0)
+    fetchCompanies()
+    .then((companies) => setCompanies(companies));
+  }); 
 
 
   return (
@@ -247,13 +292,16 @@ export default function Home({
       
       <section>
         <div className="container-fluid">
-          <div className="row">
+          {splitPanelVisible &&  <div className="row">
             <div className="col-lg-6 vh-100">
-              <LoginForm onFormSubmit={(email, password) => { 
+              <LoginForm onContinueRegistry={(email, password) => { 
                 setFormVisible(true);
                 setEmail(email);
                 setPassword(password);
-                }} ></LoginForm>
+                }} onLogin={(company) => {
+                  setSplitPanelVisible(false);
+                  setMyCompany(company);
+                }}></LoginForm>
             </div>
             {!formVisible &&
             <div className="col-lg-6 vh-100">
@@ -262,7 +310,9 @@ export default function Home({
             }
             {formVisible &&
             <div className="col-lg-6 vh-100">
-                <RegistroEmpresarial login={{email, password}} onCompanySubmitted={(company) => postCompany(company)}></RegistroEmpresarial>
+                <RegistroEmpresarial login={{email, password}} onCompanySubmitted={(company) => {
+                  setSplitPanelVisible(false); 
+                  setMyCompany(company)}} ></RegistroEmpresarial>
             </div>}
             <main>              
               {false && <ActionButtons></ActionButtons>}
@@ -277,6 +327,15 @@ export default function Home({
 
             </main>
           </div>
+              }
+              <div className="row">
+                <main>
+                <div className="col-lg-6 vh-100">
+                  <h2>Bienvenido {myCompany.nombre}!</h2>
+                  <ListadoEmpresas list={companies} />
+                  </div>
+                </main>
+              </div>
         </div>
       </section>
     </div>
