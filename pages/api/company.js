@@ -41,7 +41,7 @@ export default async (req, res) => {
     try {
         const client = await clientPromise;
         const { email, password, nombre, nit, direccion, telefono } = req.body;
-        const db = client.db("sample_mflix");
+        const db = client.db("registro-empresarial");
         const record = await db.collection('empresas').insertOne({ email, password, nombre, nit, direccion, telefono });
         res.json(record.insertedId);
     } catch (e) {

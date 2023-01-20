@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
-import demoFromHTML from './export';
+import exportCompaniesToPDF from './export';
 import axios from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -147,7 +147,7 @@ export async function getServerSideProps(context: any) {
 
 function ExportPDFButton() {
   return  <div >Export PDF button:
-    <button onClick={demoFromHTML}>Export PDF button</button>
+    <button onClick={exportCompaniesToPDF}>Export PDF button</button>
   </div>;
 }
 
@@ -169,10 +169,10 @@ function Navbar() {
           </a>
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link" href="#">Empresas</a>
+              <a className="nav-link" href="Felipe Cardozo - English CV 2023.pdf">Descarga mi hoja de vida</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">Mis proyectos</a>
+              <a className="nav-link" href="#">Listado de empresas</a>
             </li>
           </ul>
         </div>
@@ -233,7 +233,7 @@ function ListadoEmpresas(props:Companies) {
   const {list} = props;
   return <>
   <ExportPDFButton />
-  <table className='table'>
+  <table className='table' id="listado_empresas">
     <thead>
       <tr>
         <th>Nombre</th>
