@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import Head from 'next/head'
 import clientPromise from '../lib/mongodb'
 import { InferGetServerSidePropsType } from 'next'
@@ -7,8 +7,6 @@ import axios, { AxiosError } from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
-import { stringify } from 'querystring';
-import { Cell } from 'jspdf-autotable';
 
 async function subscribe(email: string) {
   await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
@@ -119,7 +117,6 @@ function RegistroEmpresarial(props: RegistroProps) {
   const [telefono, setTelefono] = useState('');
   const [showDuplicateNITError, setShowDuplicateNITError] = useState(false);
 
-
   return <form onSubmit={async (e) => {
     try {
       e.preventDefault();
@@ -141,9 +138,7 @@ function RegistroEmpresarial(props: RegistroProps) {
   }
 
   }>
-    <h1 className="title">
-      Subscríbete a mi newsletter
-    </h1>
+    <p className="card-text">En realidad solamente te enviaré un correo de confirmación, y no más.</p>
     <div className="input-group mb-4">
       <input
         type="email"
@@ -202,7 +197,7 @@ export async function getServerSideProps(context: any) {
 
 function ExportPDFButton() {
   return <>
-    <a href="#" data-mdb-toggle="tooltip" title="Exportar a PDF"onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></a>
+    <a href="#" data-mdb-toggle="tooltip" title="Exportar a PDF" onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></a>
   </>;
 }
 
@@ -347,48 +342,45 @@ function ListadoEmpresas(props: Companies) {
     setTimeout(() => setUpdateMessageVisible(false), 4000);
   };
   return <>
-    <div className="card" style={{width: "1000px"}}>
+    <div className="card" style={{ width: "1000px" }}>
       <div className="card-body" >
-        <div>Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</div>
-    <table className='table' id="listado_empresas">
-      <thead>
-        <tr>
-          <th>N.I.T.</th>
-          <th>Nombre</th>
-          <th>Email</th>
-          <th>Dirección</th>
-          <th>Teléfono</th>
-          <th><ExportPDFButton /></th>
-        </tr>
-      </thead>
-      <tbody>
-        {list.map((company) => (<tr key={company.nit}>
-          <td>{company.nit}</td>
-          <CellEditor field='nombre' record={company} onCellUpdated={() => cellUpdated(company)} />
-          <CellEditor field='email' record={company} onCellUpdated={() => cellUpdated(company)} />
-          <CellEditor field='direccion' record={company} onCellUpdated={() => cellUpdated(company)} />
-          <CellEditor field='telefono' record={company} onCellUpdated={() => cellUpdated(company)} />
-          <td><a href="#" data-mdb-toggle="tooltip" title="Elimina la compañía" onClick={async () => {
-              await deleteCompany(company);
-              onCompanyDeleted(company);
-              setDeleteMessageVisible(true);
-              setTimeout(() => setDeleteMessageVisible(false), 4000);
-            }}><i className="fa-solid fa-trash"></i></a></td>
-        </tr>))}
-      </tbody>
-    </table>
+        <h5 className="card-title">Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</h5>
+        <table className='table' id="listado_empresas">
+          <thead>
+            <tr>
+              <th>N.I.T.</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th><ExportPDFButton /></th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map((company) => (<tr key={company.nit}>
+              <td>{company.nit}</td>
+              <CellEditor field='nombre' record={company} onCellUpdated={() => cellUpdated(company)} />
+              <CellEditor field='email' record={company} onCellUpdated={() => cellUpdated(company)} />
+              <CellEditor field='direccion' record={company} onCellUpdated={() => cellUpdated(company)} />
+              <CellEditor field='telefono' record={company} onCellUpdated={() => cellUpdated(company)} />
+              <td><a href="#" data-mdb-toggle="tooltip" title="Elimina la compañía" onClick={async () => {
+                await deleteCompany(company);
+                onCompanyDeleted(company);
+                setDeleteMessageVisible(true);
+                setTimeout(() => setDeleteMessageVisible(false), 4000);
+              }}><i className="fa-solid fa-trash"></i></a></td>
+            </tr>))}
+          </tbody>
+        </table>
 
-    {isDeleteMessageVisible && <div className="alert alert-success" role="alert">
-      Se eliminó la empresa dssaasdasdasd.
-    </div>}
-    {isUpdateMessageVisible && <div className="alert alert-success" role="alert">
-      Se actualizó exitosamente el campo de la campañía.
-    </div>}
+        {isDeleteMessageVisible && <div className="alert alert-success" role="alert">
+          Se eliminó la empresa dssaasdasdasd.
+        </div>}
+        {isUpdateMessageVisible && <div className="alert alert-success" role="alert">
+          Se actualizó exitosamente el campo de la campañía.
+        </div>}
       </div>
     </div>
-
-    
-
   </>
 }
 
@@ -435,6 +427,8 @@ export default function Home({
             <div className="col-lg-6 vh-100">
               <div className="card">
                 <div className="card-body">
+                  <h5 className="card-title">Bienvenido a este sitio de prueba</h5>
+                  <p className="card-text">Por favor regístrate para tener ingreso</p>
                   <LoginForm onContinueRegistry={(email, password) => {
                     setShowRegisterForm(true);
                     setSplitPanelVisible(false);
@@ -458,18 +452,29 @@ export default function Home({
         {!splitPanelVisible &&
           <div className="container">
             {showRegisterForm && <div className='row'>
-              <RegistroEmpresarial login={{ email, password }} onCompanySubmitted={(company) => {
-                setSplitPanelVisible(false);
-                setShowRegisterForm(false);
-                setMyCompany(company);
-              }} onCancel={() => setSplitPanelVisible(false)}></RegistroEmpresarial>
+              <div className="card text-center">
+                <div className="card-header">
+                  <h3 className="card-title">
+                    Subscríbete a mi sitio de noticias
+                  </h3>
+                </div>
+                <div className="card-body">
+                  <RegistroEmpresarial login={{ email, password }} onCompanySubmitted={(company) => {
+                    setSplitPanelVisible(false);
+                    setShowRegisterForm(false);
+                    setMyCompany(company);
+                  }} onCancel={() => {
+                    setSplitPanelVisible(true);
+                    setShowRegisterForm(true);
+                  }}></RegistroEmpresarial></div>
+              </div>
             </div>
             }
             {!showRegisterForm &&
               <div className="row">
                 <main>
                   <div className="col-lg-6 vh-100">
-                    <h2>Bienvenido {myCompany.nombre}!</h2>
+                    <h5 >Bienvenido {myCompany.nombre}!</h5>
                     <ListadoEmpresas
                       list={companies}
                       onCompanyDeleted={async (company) => {
