@@ -72,13 +72,19 @@ const LoginForm = (props:LoginFormProps) => {
       setTimeout(() => {setFallidoVisible(false)}, 4000);
     }
   }}>
-    <div className="form-outline mb-4">
-      <input type="email" id="form1Example1" className="form-control" value={email} required onChange={(event) => setEmail(event.target.value)}/>
-      <label className="form-label" htmlFor="form1Example1">Email address</label>
+      
+    <div className="input-group mb-3">
+    <input
+        type="email"
+        className="form-control"
+        placeholder="Digita tu correo electrónico aquí"
+        aria-label="Tu correo electrónico"
+        aria-describedby="email"
+        value={email} required onChange={(event) => setEmail(event.target.value)}
+      />
     </div>
-    <div className="form-outline mb-4">
-      <input type="password" id="form1Example2" className="form-control" required onChange={(event) => setPassword(event.target.value)} />
-      <label className="form-label" htmlFor="form1Example2">Password</label>
+    <div className="input-group mb-4">
+      <input type="password" placeholder="Digita tu contraseña aquí" className="form-control" required onChange={(event) => setPassword(event.target.value)} />
     </div>
     <button type="submit" className="btn btn-primary btn-block" >Ingresar</button>
     <button type="button" className='btn btn-secondary btn-block' onClick={() => onContinueRegistry(email, password)}>Registrarme</button>
@@ -96,7 +102,9 @@ function isAxiosError(candidate: unknown): candidate is AxiosError {
 
 function RegistroEmpresarial(props:RegistroProps) {
   const {login, onCompanySubmitted, onCancel} = props
-  const {email, password} = login;
+  const {email:pEmail, password:pPassword} = login;
+  const [email, setEmail] = useState(pEmail);
+  const [password, setPassword] = useState(pPassword);
   const [nombre, setNombre] = useState('');
   const [nit, setNit] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -128,28 +136,31 @@ function RegistroEmpresarial(props:RegistroProps) {
         <h1 className="title">
       Subscríbete a mi newsletter
     </h1>   
-    <div className="form-outline mb-4">
-      <div >Correo electrónico: </div>
-      <div>{email}</div>
-      <div>Password: {password}</div>
+    <div className="input-group mb-4">
+    <input
+        type="email"
+        className="form-control"
+        placeholder="Digita tu correo electrónico aquí"
+        aria-label="Tu correo electrónico"
+        aria-describedby="email"
+        value={email} required onChange={(event) => setEmail(event.target.value)}
+      />
     </div>
-
-    <div className="form-outline mb-4">
-      <label htmlFor='empresa' className="form-label" >¿Cómo se llama tu empresa?</label>
-      <input type='text' name='nombre' placeholder='Mi empresa' className="form-control" required value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
-
+    <div className="input-group mb-4">
+      <input type="password" placeholder="Digita tu contraseña aquí" className="form-control" required onChange={(event) => setPassword(event.target.value)} />
     </div>
-    <div className="form-outline mb-4">
-      <label htmlFor='nit' className="form-label" >NIT o Número de Identificación Tributaria</label>
-      <input type='number' name='nit' placeholder='12345' className="form-control" value={nit} required onChange={(e) => setNit(e.target.value)}></input>
+    <div className="input-group mb-4">
+      <input type='text' name='nombre' placeholder='Nombre de tu empresa' 
+      className="form-control" required value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
     </div>
-    <div className="form-outline mb-4">
-      <label htmlFor='direccion' className="form-label">Dirección</label>
-      <input type='textarea' name="direccion" placeholder='Calle 123, Bogota' className="form-control" required value={direccion} onChange={(e) => setDireccion(e.target.value)}></input>
+    <div className="input-group mb-4">
+      <input type='number' name='nit' placeholder='NIT o Número de Identificación Tributaria' className="form-control" value={nit} required onChange={(e) => setNit(e.target.value)}></input>
     </div>
-    <div className="form-outline mb-4">
-      <label htmlFor='telefono' className="form-label" >Teléfono</label>
-      <input type='number' name='telefono' placeholder='3134136320' className="form-control" value={telefono} required onChange={(e) => setTelefono(e.target.value)}></input>
+    <div className="input-group mb-4">
+      <input type='textarea' name="direccion" placeholder='Dirección de la empresa' className="form-control" required value={direccion} onChange={(e) => setDireccion(e.target.value)}></input>
+    </div>
+    <div className="input-group mb-4">
+      <input type='number' name='telefono' placeholder='Teléfono de la empresa' className="form-control" value={telefono} required onChange={(e) => setTelefono(e.target.value)}></input>
     </div>
     <button type="submit" className="btn btn-primary btn-block">Terminar registro</button>
     <button type="button" className="btn btn-secondary btn-block" onClick={onCancel}>Cancelar</button>
@@ -307,11 +318,11 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar></Navbar>
-      
       <section>
-        <div className="container-fluid">
+        <div className="container">
           {splitPanelVisible &&  <div className="row">
             <div className="col-lg-6 vh-100">
+
               <LoginForm onContinueRegistry={(email, password) => { 
                 setFormVisible(true);
                 setEmail(email);
