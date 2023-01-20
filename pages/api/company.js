@@ -1,5 +1,5 @@
 import clientPromise from "../../lib/mongodb";
-
+import axios from 'axios';
 
 const subscribe = async (email) => {
     if (!email || !email.length) {
