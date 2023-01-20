@@ -19,14 +19,8 @@ type LoginProps = {
 type LoginFormProps = {
   onLogin: (company:Company) => void,
   onContinueRegistry: (email:string, password: string) => void
-}
+};
 
-
-async function verifyLogin(props:LoginProps) {
-  const {email, password} = props;
-  const resp = await axios.post("api/verify", {email, password});
-  return resp.data;
-}
 
 type Company = {
   email: string,
@@ -37,6 +31,18 @@ type Company = {
   telefono: string
 };
 
+
+type RegistroProps = {
+  login:LoginProps,
+  onCompanySubmitted: (company:Company) => void
+}
+
+
+async function verifyLogin(props:LoginProps) {
+  const {email, password} = props;
+  const resp = await axios.post("api/verify", {email, password});
+  return resp.data;
+}
 
 async function postCompany(company:Company){
   const resp = await axios.post('api/company', company);
@@ -73,13 +79,6 @@ const LoginForm = (props:LoginFormProps) => {
           Ingreso fallido: no encontramos una combinación de correo y contraseña correspondientes a las que ingresaste.
         </div>}
   </form>
-}
-
-
-
-type RegistroProps = {
-  login:LoginProps,
-  onCompanySubmitted: (company:Company) => void
 }
 
 function RegistroEmpresarial(props:RegistroProps) {
@@ -272,10 +271,9 @@ export default function Home({
   const [myCompany, setMyCompany] = useState({nombre:''});
 
   useEffect( () => {
-    if (companies.length === 0)
     fetchCompanies()
     .then((companies) => setCompanies(companies));
-  }); 
+  }, [myCompany]); 
 
 
   return (
@@ -308,7 +306,8 @@ export default function Home({
             <div className="col-lg-6 vh-100">
                 <RegistroEmpresarial login={{email, password}} onCompanySubmitted={(company) => {
                   setSplitPanelVisible(false); 
-                  setMyCompany(company)}} ></RegistroEmpresarial>
+                  setMyCompany(company);
+                  }} ></RegistroEmpresarial>
             </div>}
             <main>              
               {false && <ExportPDFButton></ExportPDFButton>}
