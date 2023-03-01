@@ -7,6 +7,7 @@ import axios, { AxiosError } from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
+//import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 
 async function subscribe(email: string) {
   await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
@@ -409,9 +410,10 @@ export default function Home({
   const [companies, setCompanies] = useState([]);
   const [myCompany, setMyCompany] = useState({ nombre: '' });
 
+  const reloadCompanies = () => fetchCompanies().then(setCompanies);
+
   useEffect(() => {
-    fetchCompanies()
-      .then((companies) => setCompanies(companies));
+    reloadCompanies();
   }, [myCompany]);
 
   return (
@@ -477,14 +479,8 @@ export default function Home({
                     <h5 >Bienvenido {myCompany.nombre}!</h5>
                     <ListadoEmpresas
                       list={companies}
-                      onCompanyDeleted={async (company) => {
-                        const companies = await fetchCompanies();
-                        setCompanies(companies);
-                      }}
-                      onCompanyEdited={async (company) => {
-                        const companies = await fetchCompanies();
-                        setCompanies(companies);
-                      }} />
+                      onCompanyDeleted={reloadCompanies}
+                      onCompanyEdited={reloadCompanies} />
                   </div>
                 </main>
 
