@@ -7,7 +7,7 @@ import axios, { AxiosError } from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
-//import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
+import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardTitle, MDBCardHeader } from 'mdb-react-ui-kit';
 
 async function subscribe(email: string) {
   await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
@@ -334,17 +334,15 @@ function CellEditor(props: CellEditorProps) {
 
 function ListadoEmpresas(props: Companies) {
   const { list, onCompanyDeleted, onCompanyEdited } = props;
-  const [isDeleteMessageVisible, setDeleteMessageVisible] = useState(false);
-  const [isUpdateMessageVisible, setUpdateMessageVisible] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const cellUpdated = (company: Company) => {
     onCompanyEdited(company);
-    setUpdateMessageVisible(true);
-    setTimeout(() => setUpdateMessageVisible(false), 4000);
+    setSuccessMessage(`Se actualizó exitosamente el campo de la campañía ${company.nombre}.`);
+    setTimeout(() => setSuccessMessage(''), 4000);
   };
-  return <>
-    <div className="card" style={{ width: "1000px" }}>
-      <div className="card-body" >
+  return <MDBCard styleClass={{ width: "1000px" }}>
+    <MDBCardBody>
         <h5 className="card-title">Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</h5>
         <table className='table' id="listado_empresas">
           <thead>
@@ -367,22 +365,18 @@ function ListadoEmpresas(props: Companies) {
               <td><a href="#" data-mdb-toggle="tooltip" title="Elimina la compañía" onClick={async () => {
                 await deleteCompany(company);
                 onCompanyDeleted(company);
-                setDeleteMessageVisible(true);
-                setTimeout(() => setDeleteMessageVisible(false), 4000);
+                setSuccessMessage(`Se eliminó la empresa ${company.nombre}`);
+                setTimeout(() => setSuccessMessage(''), 4000);
               }}><i className="fa-solid fa-trash"></i></a></td>
             </tr>))}
           </tbody>
         </table>
 
-        {isDeleteMessageVisible && <div className="alert alert-success" role="alert">
-          Se eliminó la empresa dssaasdasdasd.
-        </div>}
-        {isUpdateMessageVisible && <div className="alert alert-success" role="alert">
-          Se actualizó exitosamente el campo de la campañía.
-        </div>}
-      </div>
-    </div>
-  </>
+        {successMessage && <div className="alert alert-success" role="alert">
+          {successMessage}
+        </div>}    
+    </MDBCardBody>
+  </MDBCard>
 }
 
 
@@ -452,15 +446,15 @@ export default function Home({
         </div>
         }
         {!splitPanelVisible &&
-          <div className="container">
-            {showRegisterForm && <div className='row'>
-              <div className="card text-center">
-                <div className="card-header">
-                  <h3 className="card-title">
-                    Subscríbete a mi sitio de noticias
-                  </h3>
-                </div>
-                <div className="card-body">
+            <MDBContainer>
+            {showRegisterForm && <MDBRow>
+              <MDBCard className='text-center'>
+                <MDBCardHeader>
+                <MDBCardTitle>
+                  Subscríbete a mi sitio de noticias
+                  </MDBCardTitle>
+                </MDBCardHeader>
+                <MDBCardBody>
                   <RegistroEmpresarial login={{ email, password }} onCompanySubmitted={(company) => {
                     setSplitPanelVisible(false);
                     setShowRegisterForm(false);
@@ -468,12 +462,13 @@ export default function Home({
                   }} onCancel={() => {
                     setSplitPanelVisible(true);
                     setShowRegisterForm(true);
-                  }}></RegistroEmpresarial></div>
-              </div>
-            </div>
+                  }}></RegistroEmpresarial>
+                  </MDBCardBody>
+              </MDBCard>
+            </MDBRow>
             }
             {!showRegisterForm &&
-              <div className="row">
+              <MDBRow>
                 <main>
                   <div className="col-lg-6 vh-100">
                     <h5 >Bienvenido {myCompany.nombre}!</h5>
@@ -483,10 +478,9 @@ export default function Home({
                       onCompanyEdited={reloadCompanies} />
                   </div>
                 </main>
-
-              </div>
+              </MDBRow>
             }
-          </div>
+            </MDBContainer>
         }
       </section>
     </div>
