@@ -7,9 +7,9 @@ import axios, { AxiosError } from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
-import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardTitle, MDBCardHeader, MDBTable, MDBTableHead, MDBTableBody, MDBBtn, MDBInput, MDBTextArea } from 'mdb-react-ui-kit';
+import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardTitle, MDBCardHeader, MDBTable, MDBTableHead, MDBTableBody, MDBBtn, MDBInput, MDBTextArea, MDBCardText } from 'mdb-react-ui-kit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArchive, faCancel, faCheck, faCoffee, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCancel, faCheck, faFilePdf, faTrash } from '@fortawesome/free-solid-svg-icons'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 
 type LoginProps = {
@@ -31,11 +31,29 @@ type Company = {
   telefono: string
 };
 
-
 type RegistroProps = {
   login: LoginProps,
   onCompanySubmitted: (company: Company) => void,
   onCancel: () => void
+};
+
+type Companies = {
+  list: Company[],
+  onCompanyDeleted: (company: Company) => void
+  onCompanyEdited: (company: Company) => void
+};
+
+type EditorProps = {
+  field: string,
+  currentValue: any,
+  type: string,
+  onFieldUpdated: (field: string, newValue: any) => void
+}
+
+type CellEditorProps = {
+  field: 'nombre' | 'direccion' | 'telefono' | 'email',
+  record: Company,
+  onCellUpdated: (newValue: any) => void,
 }
 
 async function verifyLogin(props: LoginProps) {
@@ -59,9 +77,12 @@ async function deleteCompany(company: Company) {
   return resp.data;
 }
 
+async function updateField(field: string, newValue: any, key: number) {
+  const resp = await axios.post("api/update", { field, newValue, key });
+  return resp.data;
+}
 
-const LoginForm = (props: LoginFormProps) => {
-  const { onLogin, onContinueRegistry } = props;
+const LoginForm = ({ onLogin, onContinueRegistry }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fallidoVisible, setFallidoVisible] = useState(false);
@@ -73,27 +94,15 @@ const LoginForm = (props: LoginFormProps) => {
       onLogin(company);
     else {
       setFallidoVisible(true);
-      setTimeout(() => { setFallidoVisible(false) }, 4000);
+      setTimeout(() => setFallidoVisible(false), 4000);
     }
   }}>
-
-    <div className="input-group mb-3">
-      <input
-        type="email"
-        className="form-control"
-        placeholder="Digita tu correo electrónico aquí"
-        aria-label="Tu correo electrónico"
-        aria-describedby="email"
-        value={email} required onChange={(event) => setEmail(event.target.value)}
-      />
-    </div>
-    <div className="input-group mb-4">
-      <input type="password" placeholder="Digita tu contraseña aquí" className="form-control" required onChange={(event) => setPassword(event.target.value)} />
-    </div>
-    <div className="row">
-      <div className="col"><button type="submit" className="btn btn-primary btn-block" >Ingresar</button></div>
-      <div className="col"><button type="button" className='btn btn-secondary btn-block' onClick={() => onContinueRegistry(email, password)}>Registrarme</button></div>
-    </div>
+    <MDBInput wrapperClass='mb-3' type="email" label="Digita tu correo electrónico aquí" value={email} required onChange={(event) => setEmail(event.target.value)} />
+    <MDBInput wrapperClass='mb-4' type="password" label="Digita tu contraseña aquí" required onChange={(event) => setPassword(event.target.value)} />
+    <MDBRow>
+      <MDBCol><MDBBtn type="submit" className='btn-block'>Ingresar</MDBBtn></MDBCol>
+      <MDBCol><MDBBtn type="button" color='secondary' className='btn-block' onClick={() => onContinueRegistry(email, password)}>Registrarme</MDBBtn></MDBCol>
+    </MDBRow>
     {fallidoVisible && <div className="alert alert-danger" role="alert">
       Ingreso fallido: no encontramos una combinación de correo y contraseña correspondientes a las que ingresaste.
     </div>}
@@ -106,8 +115,7 @@ function isAxiosError(candidate: unknown): candidate is AxiosError {
   return false;
 }
 
-function RegistroEmpresarial(props: RegistroProps) {
-  const { login, onCompanySubmitted, onCancel } = props
+function RegistroEmpresarial({ login, onCompanySubmitted, onCancel }: RegistroProps) {
   const { email: pEmail, password: pPassword } = login;
   const [email, setEmail] = useState(pEmail);
   const [password, setPassword] = useState(pPassword);
@@ -120,7 +128,7 @@ function RegistroEmpresarial(props: RegistroProps) {
   return <form onSubmit={async (e) => {
     try {
       e.preventDefault();
-      const company = { email, password, nombre, nit: parseInt(nit), direccion, telefono }
+      const company = { email, password, nombre, nit: parseInt(nit), direccion, telefono };
       const result = await postCompany(company);
       if (result)
         onCompanySubmitted(company);
@@ -139,43 +147,20 @@ function RegistroEmpresarial(props: RegistroProps) {
 
   }>
     <p className="card-text">En realidad solamente te enviaré un correo de confirmación, y no más.</p>
-    <div className="input-group mb-4">
-      <input
-        type="email"
-        className="form-control"
-        placeholder="Digita tu correo electrónico aquí"
-        aria-label="Tu correo electrónico"
-        aria-describedby="email"
-        value={email} required onChange={(event) => setEmail(event.target.value)}
-      />
-    </div>
-    <div className="input-group mb-4">
-      <input type="password" placeholder="Digita tu contraseña aquí" className="form-control" required onChange={(event) => setPassword(event.target.value)} />
-    </div>
-    <div className="input-group mb-4">
-      <input type='text' name='nombre' placeholder='Nombre de tu empresa'
-        className="form-control" required value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
-    </div>
-    <div className="input-group mb-4">
-      <input type='number' name='nit' placeholder='NIT o Número de Identificación Tributaria' className="form-control" value={nit} required onChange={(e) => setNit(e.target.value)}></input>
-    </div>
-    <div className="input-group mb-4">
-      <MDBTextArea />
-      <textarea id="direccion" name="direccion" rows={4} placeholder='Dirección de la empresa' className="form-control" required value={direccion} onChange={(e) => setDireccion(e.target.value)}></textarea>
-    </div>
-    <div className="input-group mb-4">
-      <input type='number' name='telefono' placeholder='Teléfono de la empresa' className="form-control" value={telefono} required onChange={(e) => setTelefono(e.target.value)}></input>
-    </div>
-    <div className='row'>
-      <div className='col'>
-        <button type="submit" className="btn btn-primary btn-block">Terminar registro</button>
-      </div>
-      <div className='col'>
-        <button type="button" className="btn btn-secondary btn-block" onClick={onCancel}>Ya no quiero, cancelar</button>
-      </div>
-    </div>
-
-
+    <MDBInput wrapperClass='mb-4' type="email" label="Digita tu correo electrónico aquí" value={email} required onChange={(event) => setEmail(event.target.value)} />
+    <MDBInput wrapperClass='mb-4' type="password" label="Digita tu contraseña aquí" required onChange={(event) => setPassword(event.target.value)} />
+    <MDBInput wrapperClass='mb-4' type='text' name='nombre' label='Nombre de tu empresa' required value={nombre} onChange={(e) => setNombre(e.target.value)} />
+    <MDBInput wrapperClass='mb-4' type='number' name='nit' label='NIT o Número de Identificación Tributaria'  value={nit} required onChange={(e) => setNit(e.target.value)}></MDBInput>
+    <MDBTextArea wrapperClass='mb-4' id="direccion" name="direccion"   rows={4} label='Dirección de la empresa' required value={direccion} onChange={(e) => setDireccion(e.target.value)} />
+    <MDBInput wrapperClass='mb-4' type='number' name='telefono' label='Teléfono de la empresa' value={telefono} required onChange={(e) => setTelefono(e.target.value)}></MDBInput>
+    <MDBRow>
+      <MDBCol>
+        <MDBBtn type="submit" className='btn-block'>Terminar registro</MDBBtn>
+      </MDBCol>
+      <MDBCol>
+        <MDBBtn type="button" color="secondary" className='btn-block' onClick={onCancel}>Ya no quiero, cancelar</MDBBtn>
+      </MDBCol>
+    </MDBRow>
     {showDuplicateNITError && <div className="alert alert-danger" role="alert">
       NIT duplicado: hemos encontrado por lo menos un registro de empresa con el NIT {nit}.
     </div>}
@@ -197,12 +182,11 @@ export async function getServerSideProps(context: any) {
 }
 
 function ExportPDFButton() {
-  return <a href="#" data-mdb-toggle="tooltip" title="Exportar a PDF" onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></a>;
+  return <a href="#" data-mdb-toggle="tooltip" title="Exportar a PDF" onClick={exportCompaniesToPDF}><FontAwesomeIcon icon={faFilePdf}/></a>;
 }
 
 function Navbar() {
-  return <>
-    <header>
+  return <header>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
           <button className="navbar-toggler" type="button" data-mdb-toggle="collapse"
@@ -267,33 +251,13 @@ function Navbar() {
         </div>
       </nav>
     </header>
-  </>
 }
 
-type Companies = {
-  list: Company[],
-  onCompanyDeleted: (company: Company) => void
-  onCompanyEdited: (company: Company) => void
-};
-
-type EditorProps = {
-  field: string,
-  currentValue: any,
-  type: string,
-  onFieldUpdated: (field: string, newValue: any) => void
-}
-
-async function updateField(field: string, newValue: any, key: number) {
-  const resp = await axios.post("api/update", { field, newValue, key });
-  return resp.data;
-}
-
-const OnClickEditor = (props: EditorProps) => {
-  const { field, currentValue, type, onFieldUpdated } = props;
+const OnClickEditor = ({ field, currentValue, type, onFieldUpdated }: EditorProps) => {
   const [editorVisible, setEditorVisible] = useState(false);
   const [value, setValue] = useState(currentValue);
   return <>
-    {!editorVisible && <div onClick={() => { setEditorVisible(true) }}>{currentValue}</div>}
+    {!editorVisible && <div onClick={() => setEditorVisible(true) }>{currentValue}</div>}
     {editorVisible &&
       <>
         <input type={type} value={value} onChange={(e) => setValue(e.target.value)} />
@@ -313,16 +277,7 @@ const OnClickEditor = (props: EditorProps) => {
   </>
 };
 
-
-type CellEditorProps = {
-  field: 'nombre' | 'direccion' | 'telefono' | 'email',
-  record: Company,
-  onCellUpdated: (newValue: any) => void,
-}
-
-function CellEditor(props: CellEditorProps) {
-  const { field, record, onCellUpdated } = props;
-
+function CellEditor({ field, record, onCellUpdated }: CellEditorProps) {
   return <td><OnClickEditor field={field} currentValue={record[field]} type={typeof (field)}
     onFieldUpdated={async (field, newValue) => {
       await updateField(field, newValue, record.nit)
@@ -331,9 +286,7 @@ function CellEditor(props: CellEditorProps) {
   ></OnClickEditor></td>
 }
 
-
-function ListadoEmpresas(props: Companies) {
-  const { list, onCompanyDeleted, onCompanyEdited } = props;
+function ListadoEmpresas({ list, onCompanyDeleted, onCompanyEdited }: Companies) {
   const [successMessage, setSuccessMessage] = useState('');
 
   const cellUpdated = (company: Company) => {
@@ -348,7 +301,6 @@ function ListadoEmpresas(props: Companies) {
         <MDBCardBody>
           <MDBTable id="listado_empresas">
             <MDBTableHead>
-            
               <tr>
               <th>N.I.T.</th>
               <th>Nombre</th>
@@ -377,12 +329,9 @@ function ListadoEmpresas(props: Companies) {
         {successMessage && <div className="alert alert-success" role="alert">
           {successMessage}
         </div>}
-      
-
     </MDBCardBody>
   </MDBCard>
 }
-
 
 const MainSection = (isConnected: boolean) => <main>
   {false && <ExportPDFButton></ExportPDFButton>}
@@ -394,9 +343,7 @@ const MainSection = (isConnected: boolean) => <main>
       for instructions.
     </div>
   )}
-
 </main>;
-
 
 export default function Home({
   isConnected,
@@ -410,7 +357,7 @@ export default function Home({
 
   const reloadCompanies = () => fetchCompanies().then(setCompanies);
 
-  useEffect(() => {
+  useEffect(() => { 
     reloadCompanies();
   }, [myCompany]);
 
@@ -419,17 +366,20 @@ export default function Home({
       <Head>
         <title>Registro empresarial</title>
         <link rel="icon" href="/favicon.ico" />
-        
       </Head>
       {!splitPanelVisible && <Navbar></Navbar>}
       <section>
         {splitPanelVisible && <div className="container-fluid">
-          <div className="row">
+          <MDBRow>
             <div className="col-lg-6 vh-100">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title">Bienvenido a este sitio de prueba</h5>
-                  <p className="card-text">Por favor regístrate para tener ingreso</p>
+              <MDBCard>
+                <MDBCardHeader>
+                  <MDBCardTitle>Bienvenido a este sitio de prueba</MDBCardTitle>
+                </MDBCardHeader>
+                <MDBCardBody>
+                  <MDBCardText>
+                  Por favor regístrate para accederlo
+                  </MDBCardText>
                   <LoginForm onContinueRegistry={(email, password) => {
                     setShowRegisterForm(true);
                     setSplitPanelVisible(false);
@@ -440,14 +390,13 @@ export default function Home({
                     setShowRegisterForm(false);
                     setMyCompany(company);
                   }}></LoginForm>
-                </div>
-              </div>
-
+                </MDBCardBody>
+              </MDBCard>
             </div>
             <div className="col-lg-6 vh-100">
               <img src='esplanade-louvre.webp' className="w-100" ></img>
             </div>
-          </div>
+          </MDBRow>
         </div>
         }
         {!splitPanelVisible &&
@@ -456,7 +405,7 @@ export default function Home({
               <MDBCard className='text-center'>
                 <MDBCardHeader>
                 <MDBCardTitle>
-                  Subscríbete a mi sitio de noticias
+                  ¡Subscríbete a mi sitio de noticias!
                   </MDBCardTitle>
                 </MDBCardHeader>
                 <MDBCardBody>
@@ -488,4 +437,6 @@ export default function Home({
             </MDBContainer>
         }
       </section>
-    </d
+    </div>
+  )
+}
