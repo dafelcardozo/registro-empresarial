@@ -7,11 +7,11 @@ import axios, { AxiosError } from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
-import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardTitle, MDBCardHeader } from 'mdb-react-ui-kit';
+import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardTitle, MDBCardHeader, MDBTable, MDBTableHead, MDBTableBody, MDBBtn, MDBInput, MDBTextArea } from 'mdb-react-ui-kit';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArchive, faCancel, faCheck, faCoffee, faTrash } from '@fortawesome/free-solid-svg-icons'
+import '@fortawesome/fontawesome-svg-core/styles.css'
 
-async function subscribe(email: string) {
-  await axios.post("/api/subscribe", { email, text: "Hola Felipe desde local" });
-}
 type LoginProps = {
   email: string,
   password: string
@@ -21,7 +21,6 @@ type LoginFormProps = {
   onLogin: (company: Company) => void,
   onContinueRegistry: (email: string, password: string) => void
 };
-
 
 type Company = {
   email: string,
@@ -161,6 +160,7 @@ function RegistroEmpresarial(props: RegistroProps) {
       <input type='number' name='nit' placeholder='NIT o Número de Identificación Tributaria' className="form-control" value={nit} required onChange={(e) => setNit(e.target.value)}></input>
     </div>
     <div className="input-group mb-4">
+      <MDBTextArea />
       <textarea id="direccion" name="direccion" rows={4} placeholder='Dirección de la empresa' className="form-control" required value={direccion} onChange={(e) => setDireccion(e.target.value)}></textarea>
     </div>
     <div className="input-group mb-4">
@@ -197,9 +197,7 @@ export async function getServerSideProps(context: any) {
 }
 
 function ExportPDFButton() {
-  return <>
-    <a href="#" data-mdb-toggle="tooltip" title="Exportar a PDF" onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></a>
-  </>;
+  return <a href="#" data-mdb-toggle="tooltip" title="Exportar a PDF" onClick={exportCompaniesToPDF}><i className="fa-solid fa-file-pdf" ></i></a>;
 }
 
 function Navbar() {
@@ -297,19 +295,21 @@ const OnClickEditor = (props: EditorProps) => {
   return <>
     {!editorVisible && <div onClick={() => { setEditorVisible(true) }}>{currentValue}</div>}
     {editorVisible &&
-      <div>
+      <>
         <input type={type} value={value} onChange={(e) => setValue(e.target.value)} />
-        <button onClick={async () => {
+        <MDBBtn onClick={async () => {
           setEditorVisible(false);
           onFieldUpdated(field, value);
-        }}>OK</button>
-        <button onClick={() => {
-
-
+        }}>
+          <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
+        </MDBBtn>
+        <MDBBtn color='secondary' onClick={() => {
           setValue(currentValue);
           setEditorVisible(false);
-        }}>X</button>
-      </div>}
+        }}>
+          <FontAwesomeIcon icon={faCancel}></FontAwesomeIcon>
+        </MDBBtn>
+      </>}
   </>
 };
 
@@ -341,40 +341,44 @@ function ListadoEmpresas(props: Companies) {
     setSuccessMessage(`Se actualizó exitosamente el campo de la campañía ${company.nombre}.`);
     setTimeout(() => setSuccessMessage(''), 4000);
   };
-  return <MDBCard styleClass={{ width: "1000px" }}>
-    <MDBCardBody>
-        <h5 className="card-title">Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</h5>
-        <table className='table' id="listado_empresas">
-          <thead>
-            <tr>
+  return <MDBCard style={{ width: "1000px" }} >
+          <MDBCardHeader>
+            <MDBCardTitle>Puedes actualizar cualquier campo al hacer 'click' en su respectiva celda.</MDBCardTitle>
+          </MDBCardHeader>
+        <MDBCardBody>
+          <MDBTable id="listado_empresas">
+            <MDBTableHead>
+            
+              <tr>
               <th>N.I.T.</th>
               <th>Nombre</th>
               <th>Email</th>
               <th>Dirección</th>
               <th>Teléfono</th>
               <th><ExportPDFButton /></th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.map((company) => (<tr key={company.nit}>
-              <td>{company.nit}</td>
-              <CellEditor field='nombre' record={company} onCellUpdated={() => cellUpdated(company)} />
-              <CellEditor field='email' record={company} onCellUpdated={() => cellUpdated(company)} />
-              <CellEditor field='direccion' record={company} onCellUpdated={() => cellUpdated(company)} />
-              <CellEditor field='telefono' record={company} onCellUpdated={() => cellUpdated(company)} />
-              <td><a href="#" data-mdb-toggle="tooltip" title="Elimina la compañía" onClick={async () => {
-                await deleteCompany(company);
-                onCompanyDeleted(company);
-                setSuccessMessage(`Se eliminó la empresa ${company.nombre}`);
-                setTimeout(() => setSuccessMessage(''), 4000);
-              }}><i className="fa-solid fa-trash"></i></a></td>
-            </tr>))}
-          </tbody>
-        </table>
-
+              </tr>  
+            </MDBTableHead>
+            <MDBTableBody>
+              {list.map((company) => (<tr key={company.nit}>
+                <td>{company.nit}</td>
+                <CellEditor field='nombre' record={company} onCellUpdated={() => cellUpdated(company)} />
+                <CellEditor field='email' record={company} onCellUpdated={() => cellUpdated(company)} />
+                <CellEditor field='direccion' record={company} onCellUpdated={() => cellUpdated(company)} />
+                <CellEditor field='telefono' record={company} onCellUpdated={() => cellUpdated(company)} />
+                <td><a href="#" data-mdb-toggle="tooltip" title="Elimina la compañía" onClick={async () => {
+                  await deleteCompany(company);
+                  onCompanyDeleted(company);
+                  setSuccessMessage(`Se eliminó la empresa ${company.nombre}`);
+                  setTimeout(() => setSuccessMessage(''), 4000);
+                }}> <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon></a></td>
+              </tr>))}
+            </MDBTableBody>
+          </MDBTable>
         {successMessage && <div className="alert alert-success" role="alert">
           {successMessage}
-        </div>}    
+        </div>}
+      
+
     </MDBCardBody>
   </MDBCard>
 }
@@ -415,6 +419,7 @@ export default function Home({
       <Head>
         <title>Registro empresarial</title>
         <link rel="icon" href="/favicon.ico" />
+        
       </Head>
       {!splitPanelVisible && <Navbar></Navbar>}
       <section>
@@ -483,6 +488,4 @@ export default function Home({
             </MDBContainer>
         }
       </section>
-    </div>
-  )
-}
+    </d
