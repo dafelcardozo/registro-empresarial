@@ -97,7 +97,7 @@ const LoginForm = ({ onLogin, onContinueRegistry }: LoginFormProps) => {
       setTimeout(() => setFallidoVisible(false), 4000);
     }
   }}>
-    <MDBInput wrapperClass='mb-3' type="email" label="Digita tu correo electrónico aquí" value={email} required onChange={(event) => setEmail(event.target.value)} />
+    <MDBInput wrapperClass='mb-4' type="email" label="Digita tu correo electrónico aquí" value={email} required onChange={(event) => setEmail(event.target.value)} />
     <MDBInput wrapperClass='mb-4' type="password" label="Digita tu contraseña aquí" required onChange={(event) => setPassword(event.target.value)} />
     <MDBRow>
       <MDBCol><MDBBtn type="submit" className='btn-block'>Ingresar</MDBBtn></MDBCol>
