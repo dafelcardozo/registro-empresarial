@@ -5,6 +5,7 @@ import { InferGetServerSidePropsType } from 'next'
 import exportCompaniesToPDF from './export';
 import axios, { AxiosError } from 'axios';
 import 'mdb-ui-kit/css/mdb.min.css';
+import styles from '../styles.module.css'
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useState, useEffect } from 'react';
 import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardTitle, MDBCardHeader, MDBTable, MDBTableHead, MDBTableBody, MDBBtn, MDBInput, MDBTextArea, MDBCardText } from 'mdb-react-ui-kit';
@@ -56,8 +57,7 @@ type CellEditorProps = {
   onCellUpdated: (newValue: any) => void,
 }
 
-async function verifyLogin(props: LoginProps) {
-  const { email, password } = props;
+async function verifyLogin({ email, password }: LoginProps) {
   const resp = await axios.post("api/verify", { email, password });
   return resp.data;
 }
@@ -368,10 +368,10 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {!splitPanelVisible && <Navbar></Navbar>}
-      <section>
+      <section className={styles.topography}>
         {splitPanelVisible && <div className="container-fluid">
           <MDBRow>
-            <div className="col-lg-6 vh-100">
+            <div className={`col-lg-6 vh-100 ${styles.topography}`} >
               <MDBCard>
                 <MDBCardHeader>
                   <MDBCardTitle>Bienvenido a este sitio de prueba</MDBCardTitle>
@@ -393,8 +393,8 @@ export default function Home({
                 </MDBCardBody>
               </MDBCard>
             </div>
-            <div className="col-lg-6 vh-100">
-              <img src='esplanade-louvre.webp' className="w-100" ></img>
+            <div className="col-lg-6 vh-100" style={{backgroundImage:"url(esplanade-louvre.webp)",backgroundSize: "auto 100%", 
+backgroundRepeat: "no-repeat"}}>
             </div>
           </MDBRow>
         </div>
@@ -424,7 +424,7 @@ export default function Home({
             {!showRegisterForm &&
               <MDBRow>
                 <main>
-                  <div className="col-lg-6 vh-100">
+                  <div className={"col-lg-6 vh-100 "}>
                     <h5 >Bienvenido {myCompany.nombre}!</h5>
                     <ListadoEmpresas
                       list={companies}
