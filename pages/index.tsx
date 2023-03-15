@@ -109,10 +109,13 @@ const LoginForm = ({ onLogin, onContinueRegistry }: LoginFormProps) => {
   </form>
 }
 function isAxiosError(candidate: unknown): candidate is AxiosError {
+  return !!(candidate && typeof candidate === 'object' && 'isAxiosError' in candidate);
+  /*
   if (candidate && typeof candidate === 'object' && 'isAxiosError' in candidate) {
     return true;
   }
   return false;
+  */
 }
 
 function RegistroEmpresarial({ login, onCompanySubmitted, onCancel }: RegistroProps) {
