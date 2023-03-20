@@ -110,28 +110,16 @@ const LoginForm = ({ onLogin, onContinueRegistry }: LoginFormProps) => {
 }
 function isAxiosError(candidate: unknown): candidate is AxiosError {
   return !!(candidate && typeof candidate === 'object' && 'isAxiosError' in candidate);
-  /*
-  if (candidate && typeof candidate === 'object' && 'isAxiosError' in candidate) {
-    return true;
-  }
-  return false;
-  */
 }
 
 function RegistroEmpresarial({ login, onCompanySubmitted, onCancel }: RegistroProps) {
-  const { email: pEmail, password: pPassword } = login;
-  const [email, setEmail] = useState(pEmail);
-  const [password, setPassword] = useState(pPassword);
-  const [nombre, setNombre] = useState('');
-  const [nit, setNit] = useState('');
-  const [direccion, setDireccion] = useState('');
-  const [telefono, setTelefono] = useState('');
   const [showDuplicateNITError, setShowDuplicateNITError] = useState(false);
+  const [company, setCompany] = useState({...login, nombre:'', nit:NaN, direccion:'', telefono:''});
+  const { email, password, nombre, nit, direccion, telefono } = company;
 
   return <form onSubmit={async (e) => {
     try {
       e.preventDefault();
-      const company = { email, password, nombre, nit: parseInt(nit), direccion, telefono };
       const result = await postCompany(company);
       if (result)
         onCompanySubmitted(company);
@@ -150,12 +138,12 @@ function RegistroEmpresarial({ login, onCompanySubmitted, onCancel }: RegistroPr
 
   }>
     <p className="card-text">En realidad solamente te enviaré un correo de confirmación, y no más.</p>
-    <MDBInput wrapperClass='mb-4' type="email" label="Digita tu correo electrónico aquí" value={email} required onChange={(event) => setEmail(event.target.value)} />
-    <MDBInput wrapperClass='mb-4' type="password" label="Digita tu contraseña aquí" required onChange={(event) => setPassword(event.target.value)} />
-    <MDBInput wrapperClass='mb-4' type='text' name='nombre' label='Nombre de tu empresa' required value={nombre} onChange={(e) => setNombre(e.target.value)} />
-    <MDBInput wrapperClass='mb-4' type='number' name='nit' label='NIT o Número de Identificación Tributaria'  value={nit} required onChange={(e) => setNit(e.target.value)}></MDBInput>
-    <MDBTextArea wrapperClass='mb-4' id="direccion" name="direccion"   rows={4} label='Dirección de la empresa' required value={direccion} onChange={(e) => setDireccion(e.target.value)} />
-    <MDBInput wrapperClass='mb-4' type='number' name='telefono' label='Teléfono de la empresa' value={telefono} required onChange={(e) => setTelefono(e.target.value)}></MDBInput>
+    <MDBInput wrapperClass='mb-4' type="email" label="Digita tu correo electrónico aquí" value={email} required onChange={({target}) => setCompany({ ...company, email: target.value})} />
+    <MDBInput wrapperClass='mb-4' type="password" label="Digita tu contraseña aquí" required value={ password } onChange={({target}) => setCompany({...company, password:target.value})} />
+    <MDBInput wrapperClass='mb-4' type='text' name='nombre' label='Nombre de tu empresa' required value={nombre} onChange={({target}) => setCompany({...company, nombre: target.value})} />
+    <MDBInput wrapperClass='mb-4' type='number' name='nit' label='NIT o Número de Identificación Tributaria'  value={nit} required onChange={({target}) => setCompany({...company, nit:parseInt(target.value)})}></MDBInput>
+    <MDBTextArea wrapperClass='mb-4' id="direccion" name="direccion"   rows={4} label='Dirección de la empresa' required value={direccion} onChange={({target}) => setCompany({...company, direccion:target.value})} />
+    <MDBInput wrapperClass='mb-4' type='number' name='telefono' label='Teléfono de la empresa' value={telefono} required onChange={({target}) => setCompany({...company, telefono:target.value})}></MDBInput>
     <MDBRow>
       <MDBCol>
         <MDBBtn type="submit" className='btn-block'>Terminar registro</MDBBtn>
@@ -314,7 +302,7 @@ function ListadoEmpresas({ list, onCompanyDeleted, onCompanyEdited }: Companies)
               </tr>  
             </MDBTableHead>
             <MDBTableBody>
-              {list.map((company) => (<tr key={company.nit}>
+              {list.map((company:Company) => (<tr key={company.nit}>
                 <td>{company.nit}</td>
                 <CellEditor field='nombre' record={company} onCellUpdated={() => cellUpdated(company)} />
                 <CellEditor field='email' record={company} onCellUpdated={() => cellUpdated(company)} />
